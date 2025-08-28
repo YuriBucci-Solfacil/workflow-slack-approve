@@ -88,3 +88,11 @@
   * **Prompt do Usuário:** "Certo, agora adicione uma opção para que eu possa alterar o nome dos bottões de approve e de reject"
   * **Ação/Resultado da IA:** Implementei dois novos parâmetros (`approveButtonText` e `rejectButtonText`) que permitem personalizar o texto exibido nos botões. Os valores padrão foram mantidos como "✅ Approve" e "❌ Reject", mas agora podem ser alterados conforme a necessidade do usuário.
 
+### Checkpoint: 12 - Melhorias no sistema de logs e modo debug
+* **GIT SHA:** `9259a93354f9785735ce66c33ae36c4048e1a48a`
+* **Commit Message:** `AI: Enhanced - Logging system with colors and debug mode`
+* **Notes/Observations:** Implementação de um sistema de logs aprimorado com cores para diferentes níveis de mensagens e adição de um modo de debug configurável. Agora os logs são mais profissionais e legíveis, e o usuário pode ativar informações detalhadas de depuração quando necessário.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Agora melhore as logs e cores para ficar mais profissional e adicione uma opção para desativar e ativar o debug sendo o default desabilitado"
+  * **Ação/Resultado da IA:** Implementei um sistema de logging colorido usando a biblioteca chalk, com diferentes cores para cada tipo de mensagem (info em azul, sucesso em verde, avisos em amarelo, erros em vermelho e debug em magenta). Adicionei o parâmetro `debug` (padrão: false) que permite ativar logs de depuração detalhados e otimizei todas as mensagens do sistema para usar o novo formato.
+
