@@ -15,6 +15,10 @@
 ### Checkpoint: 2 - Atualização da documentação
 * **GIT SHA:** `8c43957072a615fbba4d9985c53600d7ab05d993`
 * **Commit Message:** `AI: Updated - Documentation with implementation details`
+
+### Checkpoint: 3 - Atualização do manifesto
+* **GIT SHA:** `5e8704bed901a224adfb90431e1e8a949a5b8209`
+* **Commit Message:** `AI: Updated - Manifest with new checkpoint`
 * **Notes/Observations:** Implementação da funcionalidade de envio de mensagens diretamente para usuários no Slack em vez de apenas grupos. Adicionada suporte para a variável de ambiente SLACK_USER_ID e a lógica para abrir conversas diretas usando a API do Slack.
 * **AI Interaction**:
   * **Prompt do Usuário:** "Este é um projeto que eu clonei de uma Action. Quero ajustar para o seguinte: Atualmente ele manda a mensagem para um GRUPO do slack, porém eu gostaria de mandar diretamente para o usuário no slack como se fosse uma mensagem privada, conseguimos fazer isso?"
