@@ -120,3 +120,11 @@
   * **Prompt do Usuário:** "[Exemplo de logs com informações sensíveis] Retire essas informaçõe sensiveis da LOG com ID do usuario por exemplo, coloque ela apenas no modo DEBUG, deixe o mais limpa possivel. Nessa log aqui consegue ficar atualizando ela talvez com o tempo de timeout do lado ou algo tipo, exemplo abaixo [INFO] Look at your Slack message #Melhore esse texto se quiser [INFO] Waiting for approval [5s/10m]"
   * **Ação/Resultado da IA:** Modifiquei o sistema de logs para mover todas as informações sensíveis (como IDs de usuário, endereços de e-mail e detalhes técnicos) para o modo debug, mantendo apenas mensagens essenciais no modo padrão. Implementei um contador de tempo que mostra o tempo decorrido e o tempo restante no formato "[tempo decorrido em segundos]/[tempo restante em minutos e segundos]", atualizando a cada 5 segundos para fornecer feedback visual sobre o progresso da espera.
 
+### Checkpoint: 16 - Geração automática de UNIQUE_STEP_ID
+* **GIT SHA:** `c67444d0bce7588ca6a2aeadfe832e8e9e9fcca0`
+* **Commit Message:** `AI: Added - Automatic generation of UNIQUE_STEP_ID`
+* **Notes/Observations:** Implementação de um sistema de geração automática para o identificador único `UNIQUE_STEP_ID`, tornando-o opcional. Se não for fornecido pelo usuário, um ID único será gerado automaticamente combinando um timestamp em base 36 com um número aleatório, garantindo a unicidade de cada execução.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "UNIQUE_STEP_ID não conseguimos gerar algum numero aleatorio automaticamente?"
+  * **Ação/Resultado da IA:** Implementei uma função `generateUniqueId()` que cria um identificador único baseado em um timestamp e um número aleatório quando o `UNIQUE_STEP_ID` não é fornecido pelo usuário. Atualizei a documentação para refletir que esta variável de ambiente agora é opcional e modificamos o exemplo no README para mostrar que o ID será gerado automaticamente se não for especificado.
+
