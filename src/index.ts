@@ -40,7 +40,7 @@ if (!channel_id && !user_id && !user_email) {
   process.exit(1);
 }
 const unique_step_id = process.env.UNIQUE_STEP_ID || "";
-logger.info(`Initializing approval process with ID: ${unique_step_id}`);
+logger.info(`Approval process initialized`);
 const baseMessageTs = core.getInput("baseMessageTs");
 // Lista original de aprovadores (pode conter IDs ou e-mails)
 const rawApprovers = core
@@ -96,7 +96,7 @@ async function run(): Promise<void> {
         });
 
         if (response.ok && response.user && response.user.id) {
-          logger.success(`Successfully resolved email ${email} to Slack user ID: ${response.user.id}`);
+          logger.debug(`Successfully resolved email ${email} to Slack user ID: ${response.user.id}`);
           return response.user.id;
         } else {
           logger.warn(`Failed to find Slack user ID for email: ${email}`);
@@ -113,11 +113,11 @@ async function run(): Promise<void> {
       approver.trim();
       // Se parece um e-mail, tente resolver para ID
       if (approver.includes('@')) {
-        logger.info(`Approver ${approver} appears to be an email, attempting to resolve to Slack user ID`);
+        logger.debug(`Approver ${approver} appears to be an email, attempting to resolve to Slack user ID`);
         const userId = await resolveEmailToUserId(approver);
         if (userId) {
           requiredApprovers.push(userId);
-          logger.success(`Added ${approver} => ${userId} to approvers list`);
+          logger.debug(`Added ${approver} => ${userId} to approvers list`);
         } else {
           logger.warn(`Could not resolve email ${approver} to a Slack user ID. This approver won't be able to authorize.`);
         }
@@ -351,11 +351,11 @@ async function run(): Promise<void> {
     // Tentar obter o ID do usuário pelo e-mail se não fornecido diretamente
     let finalUserId = user_id;
     if (!finalUserId && user_email) {
-      logger.info(`Trying to find user ID for email: ${user_email}`);
+      logger.debug(`Trying to find user ID for email: ${user_email}`);
       const emailLookupResult = await getUserIdByEmail(user_email);
       if (emailLookupResult) {
         finalUserId = emailLookupResult;
-        logger.success(`Successfully resolved email ${user_email} to user ID ${finalUserId}`);
+        logger.debug(`Successfully resolved email ${user_email} to user ID ${finalUserId}`);
       } else {
         logger.warn(`Could not resolve email ${user_email} to a Slack user ID. Falling back to channel.`);
       }
@@ -367,7 +367,7 @@ async function run(): Promise<void> {
         await web.conversations.info({
           channel: channel_id
         });
-        logger.info(`Channel ${channel_id} exists and is accessible.`);
+        logger.debug(`Channel ${channel_id} exists and is accessible.`);
       } catch (error) {
         logger.error(`The fallback channel ${channel_id} does not exist or bot doesn't have access to it. Please ensure the SLACK_CHANNEL_ID is correct and the bot is invited to the channel.`);
         logger.debug(`Error details: ${error}`);
@@ -379,7 +379,7 @@ async function run(): Promise<void> {
         }
       }
     } else {
-      logger.info("No channel ID provided. Using direct messages only without fallback.");
+      logger.debug("No channel ID provided. Using direct messages only without fallback.");
     }
 
     // Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
@@ -687,9 +687,29 @@ async function run(): Promise<void> {
 
     (async () => {
       await app.start(3000);
-      logger.info("Waiting for approval reaction...");
-      logger.info(`Debug mode: ${isDebugMode ? "enabled" : "disabled"}`);
-
+      logger.info("Slack approval message sent. Check your Slack notifications.");
+      
+      // Determinar o tempo máximo de espera (10 minutos por padrão)
+      const timeoutMinutes = 10;
+      const timeoutMs = timeoutMinutes * 60 * 1000;
+      const startTime = Date.now();
+      
+      // Iniciar o contador de tempo
+      const timer = setInterval(() => {
+        const elapsedMs = Date.now() - startTime;
+        const elapsedSeconds = Math.floor(elapsedMs / 1000);
+        const remainingMs = timeoutMs - elapsedMs;
+        
+        if (remainingMs <= 0) {
+          clearInterval(timer);
+          logger.info("Waiting for approval [timeout]");
+        } else {
+          const remainingMinutes = Math.floor(remainingMs / 60000);
+          const remainingSeconds = Math.floor((remainingMs % 60000) / 1000);
+          logger.info(`Waiting for approval [${elapsedSeconds}s/${remainingMinutes}m${remainingSeconds}s]`);
+        }
+      }, 5000); // Atualizar a cada 5 segundos
+      
       if (isDebugMode) {
         logger.debug("Debug information:");
         logger.debug(`- Unique step ID: ${unique_step_id}`);
