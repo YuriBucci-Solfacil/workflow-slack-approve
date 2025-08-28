@@ -24,17 +24,107 @@ inputs:
     description: "The base message payload to display. If not set, will use default message from README. To customize, provide Slack message payload JSON"
     required: false
     default: |
-      {}
+      {
+        "blocks": [
+          {
+            "type": "header",
+            "text": {
+              "type": "plain_text",
+              "text": "🔔 Approval Request",
+              "emoji": true
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "*GitHub Actions Workflow* requires your approval to proceed."
+            }
+          },
+          {
+            "type": "divider"
+          },
+          {
+            "type": "context",
+            "elements": [
+              {
+                "type": "mrkdwn",
+                "text": "Approval request from GitHub Actions"
+              }
+            ]
+          }
+        ]
+      }
   successMessagePayload:
     description: "The message body indicating approval is success. If not set, will use baseMessagePayload."
     required: false
     default: |
-      {}
+      {
+        "blocks": [
+          {
+            "type": "header",
+            "text": {
+              "type": "plain_text",
+              "text": "✅ Approval Completed",
+              "emoji": true
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "The workflow has been *successfully approved* and will continue execution."
+            }
+          },
+          {
+            "type": "divider"
+          },
+          {
+            "type": "context",
+            "elements": [
+              {
+                "type": "mrkdwn",
+                "text": "Approved via GitHub Actions workflow"
+              }
+            ]
+          }
+        ]
+      }
   failMessagePayload:
     description: "The message body indicating approval is fail. If not set, will use baseMessagePayload."
     required: false
     default: |
-      {}
+      {
+        "blocks": [
+          {
+            "type": "header",
+            "text": {
+              "type": "plain_text",
+              "text": "❌ Approval Rejected",
+              "emoji": true
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "The workflow has been *rejected* and will not continue execution."
+            }
+          },
+          {
+            "type": "divider"
+          },
+          {
+            "type": "context",
+            "elements": [
+              {
+                "type": "mrkdwn",
+                "text": "Rejected via GitHub Actions workflow"
+              }
+            ]
+          }
+        ]
+      }
   approveButtonText:
     description: "Custom text for the approve button. Default is '✅ Approve'"
     required: false

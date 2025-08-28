@@ -686,7 +686,7 @@ async function run(): Promise<void> {
       await app.start(3000);
       logger.info("Waiting for approval reaction...");
       logger.info(`Debug mode: ${isDebugMode ? "enabled" : "disabled"}`);
-      
+
       if (isDebugMode) {
         logger.debug("Debug information:");
         logger.debug(`- Unique step ID: ${unique_step_id}`);

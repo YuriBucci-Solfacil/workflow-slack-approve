@@ -136,16 +136,19 @@ jobs:
     - Optional (default: "1")
 
   - `baseMessagePayload`
-    - The base message payload to display. If not set, will use default message from README. To customize, provide Slack message payload JSON
-    - Optional (default: "{}")
+    - The base message payload to display. To customize, provide Slack message payload JSON
+    - Optional (default: formatted message with header "🔔 Approval Request")
+    - Default includes a header, message text, divider and context section
 
   - `successMessagePayload`
     - The message body indicating approval is success. If not set, will use baseMessagePayload.
-    - Optional (default: "{}")
+    - Optional (default: formatted message with header "✅ Approval Completed")
+    - Default includes a header, success message, divider and context section
 
   - `failMessagePayload`
     - The message body indicating approval is fail. If not set, will use baseMessagePayload.
-    - Optional (default: "{}")
+    - Optional (default: formatted message with header "❌ Approval Rejected")
+    - Default includes a header, rejection message, divider and context section
 
   - `approveButtonText`
     - Custom text for the approve button
