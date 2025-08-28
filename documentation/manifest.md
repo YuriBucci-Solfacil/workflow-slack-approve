@@ -64,3 +64,11 @@
   * **Prompt do Usuário:** "Por favor tire a obrigatoriedade desse `Error: SLACK_CHANNEL_ID environment variable is required. Please set it to a valid Slack channel ID.` Visto que não usando channel neste momento apenas mensagem direta"
   * **Ação/Resultado da IA:** Modifiquei o código para tornar a variável `SLACK_CHANNEL_ID` opcional quando `SLACK_USER_ID` ou `SLACK_USER_EMAIL` estiver definido. Atualizei o sistema para verificar pelo menos uma forma válida de enviar mensagens e melhorei o tratamento de erros para lidar com configurações sem canal de fallback.
 
+### Checkpoint: 9 - Correção da validação de aprovadores
+* **GIT SHA:** `903df6e1665e51848dbeb7823f325bb26bcb0405`
+* **Commit Message:** `AI: Fixed - Check for approvers count after email resolution`
+* **Notes/Observations:** Correção de um bug na verificação de número mínimo de aprovadores. A verificação estava sendo executada muito cedo no código, antes que os e-mails dos aprovadores fossem convertidos para IDs de usuário do Slack, resultando em erro mesmo quando havia aprovadores válidos especificados como e-mails.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Parece que agora não mandou nada: unique_step_id 1234 [DEBUG] web-api:WebClient:0 initialized [...] Error: Insufficient approvers. Minimum required approvers not met."
+  * **Ação/Resultado da IA:** Identifiquei que a verificação de número mínimo de aprovadores estava sendo executada antes da conversão de e-mails para IDs. Movi a verificação para depois da resolução de e-mails e adicionei mensagens de erro mais detalhadas para facilitar a depuração.
+
