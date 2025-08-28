@@ -80,3 +80,11 @@
   * **Prompt do Usuário:** "Agora funcionou o approve, porém após clicar não era pro botão sumir e retornar alguma mensagem?"
   * **Ação/Resultado da IA:** Identifiquei que os botões de aprovação não estavam sendo removidos após a aprovação. Modifiquei o código para substituir os botões por uma mensagem de confirmação clara que mostra quem aprovou e quando a aprovação foi concluída.
 
+### Checkpoint: 11 - Personalização dos textos dos botões
+* **GIT SHA:** `df29fa4611b65d0a1ed5a171caa3b9558b0c9549`
+* **Commit Message:** `AI: Added - Custom button text options`
+* **Notes/Observations:** Adição de funcionalidade para personalizar os textos dos botões de aprovação e rejeição. Agora é possível configurar o texto exibido em cada botão de acordo com o idioma ou preferência do usuário.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Certo, agora adicione uma opção para que eu possa alterar o nome dos bottões de approve e de reject"
+  * **Ação/Resultado da IA:** Implementei dois novos parâmetros (`approveButtonText` e `rejectButtonText`) que permitem personalizar o texto exibido nos botões. Os valores padrão foram mantidos como "✅ Approve" e "❌ Reject", mas agora podem ser alterados conforme a necessidade do usuário.
+
