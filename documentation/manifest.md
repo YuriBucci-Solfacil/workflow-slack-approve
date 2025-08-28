@@ -24,3 +24,11 @@
   * **Prompt do Usuário:** "Este é um projeto que eu clonei de uma Action. Quero ajustar para o seguinte: Atualmente ele manda a mensagem para um GRUPO do slack, porém eu gostaria de mandar diretamente para o usuário no slack como se fosse uma mensagem privada, conseguimos fazer isso?"
   * **Ação/Resultado da IA:** Analisei o código, implementei uma função getDirectMessageChannel que usa a API conversations.open do Slack para criar conversas diretas, adicionei suporte a nova variável de ambiente SLACK_USER_ID e atualizei a documentação.
 
+### Checkpoint: 4 - Implementação da busca de usuário por e-mail
+* **GIT SHA:** `92963f5f551d85cf7d08911a10ef490ab675b59e`
+* **Commit Message:** `AI: Implemented - Lookup user by email feature`
+* **Notes/Observations:** Adição de funcionalidade para buscar automaticamente o ID do usuário no Slack a partir do endereço de e-mail. Implementada a variável de ambiente SLACK_USER_EMAIL e a função getUserIdByEmail que utiliza a API users.lookupByEmail do Slack.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Certo, como precisar do ID do usuário, não conseguimos obter automaticamente o ID do usuário baseado no e-mail cadastrado no slack?"
+  * **Ação/Resultado da IA:** Implementei a funcionalidade de busca por e-mail com a nova variável de ambiente SLACK_USER_EMAIL, adicionei a função getUserIdByEmail usando o método users.lookupByEmail da API do Slack, e atualizei toda a documentação para incluir esta opção.
+
