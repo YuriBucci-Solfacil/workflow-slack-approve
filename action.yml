@@ -43,6 +43,10 @@ inputs:
     description: "Custom text for the reject button. Default is '❌ Reject'"
     required: false
     default: "❌ Reject"
+  debug:
+    description: "Enable debug logging (verbose output)"
+    required: false
+    default: "false"
 
 outputs:
   mainMessageTs:

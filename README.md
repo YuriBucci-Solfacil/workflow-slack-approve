@@ -84,6 +84,8 @@ jobs:
             # Personalização dos textos dos botões (opcional)
             approveButtonText: "✅ Aprovar"
             rejectButtonText: "❌ Rejeitar"
+            # Habilitar logs de debug (opcional)
+            debug: "false"
             baseMessagePayload: |
               {}
             successMessagePayload: |
@@ -152,6 +154,10 @@ jobs:
   - `rejectButtonText`
     - Custom text for the reject button
     - Optional (default: "❌ Reject")
+
+  - `debug`
+    - Enable debug logging (verbose output)
+    - Optional (default: "false")
 
 
 ## outputs
