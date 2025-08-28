@@ -35,6 +35,14 @@ inputs:
     required: false
     default: |
       {}
+  approveButtonText:
+    description: "Custom text for the approve button. Default is '✅ Approve'"
+    required: false
+    default: "✅ Approve"
+  rejectButtonText:
+    description: "Custom text for the reject button. Default is '❌ Reject'"
+    required: false
+    default: "❌ Reject"
 
 outputs:
   mainMessageTs:

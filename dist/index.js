@@ -68,6 +68,9 @@ const baseMessagePayload = JSON.parse(core.getMultilineInput("baseMessagePayload
 const approvers = [];
 const successMessagePayload = JSON.parse(core.getMultilineInput("successMessagePayload").join(""));
 const failMessagePayload = JSON.parse(core.getMultilineInput("failMessagePayload").join(""));
+// Textos personalizados para os botões
+const approveButtonText = core.getInput("approveButtonText") || "✅ Approve";
+const rejectButtonText = core.getInput("rejectButtonText") || "❌ Reject";
 const app = new bolt_1.App({
     token: token,
     signingSecret: signingSecret,
@@ -175,7 +178,7 @@ function run() {
                                 text: {
                                     type: "plain_text",
                                     emoji: true,
-                                    text: `✅ Approve (${remainingApprovals} needed)`,
+                                    text: `${approveButtonText} (${remainingApprovals} needed)`,
                                 },
                                 style: "primary",
                                 value: aid,
@@ -186,7 +189,7 @@ function run() {
                                 text: {
                                     type: "plain_text",
                                     emoji: true,
-                                    text: "❌ Reject",
+                                    text: rejectButtonText,
                                 },
                                 style: "danger",
                                 value: aid,

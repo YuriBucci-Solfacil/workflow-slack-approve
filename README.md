@@ -81,6 +81,9 @@ jobs:
         with:
             approvers: U12345678,user.name@example.com
             minimumApprovalCount: 2
+            # Personalização dos textos dos botões (opcional)
+            approveButtonText: "✅ Aprovar"
+            rejectButtonText: "❌ Rejeitar"
             baseMessagePayload: |
               {}
             successMessagePayload: |
@@ -141,6 +144,14 @@ jobs:
   - `failMessagePayload`
     - The message body indicating approval is fail. If not set, will use baseMessagePayload.
     - Optional (default: "{}")
+
+  - `approveButtonText`
+    - Custom text for the approve button
+    - Optional (default: "✅ Approve")
+
+  - `rejectButtonText`
+    - Custom text for the reject button
+    - Optional (default: "❌ Reject")
 
 
 ## outputs

@@ -40,6 +40,10 @@ const failMessagePayload = JSON.parse(
   core.getMultilineInput("failMessagePayload").join("")
 );
 
+// Textos personalizados para os botões
+const approveButtonText = core.getInput("approveButtonText") || "✅ Approve";
+const rejectButtonText = core.getInput("rejectButtonText") || "❌ Reject";
+
 const app = new App({
   token: token,
   signingSecret: signingSecret,
@@ -153,7 +157,7 @@ async function run(): Promise<void> {
               text: {
                 type: "plain_text",
                 emoji: true,
-                text: `✅ Approve (${remainingApprovals} needed)`,
+                text: `${approveButtonText} (${remainingApprovals} needed)`,
               },
               style: "primary",
               value: aid,
@@ -164,7 +168,7 @@ async function run(): Promise<void> {
               text: {
                 type: "plain_text",
                 emoji: true,
-                text: "❌ Reject",
+                text: rejectButtonText,
               },
               style: "danger",
               value: aid,
@@ -447,24 +451,24 @@ async function run(): Promise<void> {
               logger.info(`Request fully approved by ${userName}. Exiting with success.`);
 
               // Criar uma mensagem de sucesso personalizada que inclui o status de aprovação e uma mensagem de confirmação
-              const successBlocks = hasPayload(successMessagePayload) 
+              const successBlocks = hasPayload(successMessagePayload)
                 ? [...successMessagePayload.blocks || [], {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `🎉 *Approval Complete!* All ${minimumApprovalCount} required approvals have been received.\nApproved by ${approvers.map((v) => `<@${v}>`).join(", ")} on ${new Date().toLocaleString()}`
+                  }
+                }]
+                : [
+                  ...mainMessagePayload.blocks.slice(0, -2),
+                  {
                     type: "section",
                     text: {
                       type: "mrkdwn",
                       text: `🎉 *Approval Complete!* All ${minimumApprovalCount} required approvals have been received.\nApproved by ${approvers.map((v) => `<@${v}>`).join(", ")} on ${new Date().toLocaleString()}`
                     }
-                  }]
-                : [
-                    ...mainMessagePayload.blocks.slice(0, -2),
-                    {
-                      type: "section",
-                      text: {
-                        type: "mrkdwn",
-                        text: `🎉 *Approval Complete!* All ${minimumApprovalCount} required approvals have been received.\nApproved by ${approvers.map((v) => `<@${v}>`).join(", ")} on ${new Date().toLocaleString()}`
-                      }
-                    }
-                  ];
+                  }
+                ];
 
               await client.chat.update({
                 ts: mainMessage.ts || "",
@@ -588,25 +592,25 @@ async function run(): Promise<void> {
 
           // Update the main message with rejection
           try {
-            const rejectionBlocks = hasPayload(failMessagePayload) 
+            const rejectionBlocks = hasPayload(failMessagePayload)
               ? [...failMessagePayload.blocks || [], {
+                type: "section",
+                text: {
+                  type: "mrkdwn",
+                  text: `❌ *Request Rejected*\nRejected by <@${userId}> on ${new Date().toLocaleString()}`,
+                },
+              }]
+              : [
+                ...mainMessagePayload.blocks.slice(0, -2),
+                {
                   type: "section",
                   text: {
                     type: "mrkdwn",
                     text: `❌ *Request Rejected*\nRejected by <@${userId}> on ${new Date().toLocaleString()}`,
                   },
-                }]
-              : [
-                  ...mainMessagePayload.blocks.slice(0, -2),
-                  {
-                    type: "section",
-                    text: {
-                      type: "mrkdwn",
-                      text: `❌ *Request Rejected*\nRejected by <@${userId}> on ${new Date().toLocaleString()}`,
-                    },
-                  },
-                ];
-            
+                },
+              ];
+
             await client.chat.update({
               ts: mainMessage.ts || "",
               channel: channelId || targetChannelId,
