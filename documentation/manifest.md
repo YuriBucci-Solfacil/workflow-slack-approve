@@ -48,3 +48,11 @@
   * **Prompt do Usuário:** "Run YuriBucci-Solfacil/workflow-slack-approve@main node:internal/modules/cjs/loader:1215 throw err; ^ Error: Cannot find module '@actions/core' Require stack: - /home/runner/work/_actions/YuriBucci-Solfacil/workflow-slack-approve/main/dist/index.js"
   * **Ação/Resultado da IA:** Implementei uma solução usando o @vercel/ncc para empacotar o código TypeScript compilado junto com todas as suas dependências em um único arquivo JavaScript, modificando o processo de build e a estrutura do projeto para seguir as recomendações do GitHub para Actions.
 
+### Checkpoint: 7 - Implementação de aprovadores baseados em e-mail
+* **GIT SHA:** `9d074b4f6f7f7d5bf53f4d09dcc35c707a7d22bb`
+* **Commit Message:** `AI: Added - Support for email-based approvers`
+* **Notes/Observations:** Adição da funcionalidade para especificar aprovadores usando seus endereços de e-mail. Agora o script consegue converter automaticamente e-mails para IDs de usuário do Slack no momento da execução.
+* **AI Interaction**:
+  * **Prompt do Usuário:** [Imagem de uma tela mostrando o problema de autorização] "Tentei aprovar: [WARN] bolt-app Unauthorized approval attempt by user: yuri.bucci (U08534M0R3Q)"
+  * **Ação/Resultado da IA:** Identifiquei que o problema estava na forma como os aprovadores são especificados. Modifiquei o código para permitir que os aprovadores sejam especificados usando endereços de e-mail, que são então convertidos para IDs de usuário do Slack no início da execução do script, permitindo a aprovação por usuários sem conhecer seus IDs do Slack.
+
