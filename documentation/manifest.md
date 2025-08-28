@@ -32,3 +32,11 @@
   * **Prompt do Usuário:** "Certo, como precisar do ID do usuário, não conseguimos obter automaticamente o ID do usuário baseado no e-mail cadastrado no slack?"
   * **Ação/Resultado da IA:** Implementei a funcionalidade de busca por e-mail com a nova variável de ambiente SLACK_USER_EMAIL, adicionei a função getUserIdByEmail usando o método users.lookupByEmail da API do Slack, e atualizei toda a documentação para incluir esta opção.
 
+### Checkpoint: 5 - Correção para GitHub Action
+* **GIT SHA:** `eb692ba2e4d8a96269a81d12ccea465402c9d946`
+* **Commit Message:** `AI: Added - dist files required for GitHub Action`
+* **Notes/Observations:** Correção do erro na execução da GitHub Action removendo a pasta `dist/` do arquivo `.gitignore` e incluindo os arquivos compilados no repositório, permitindo que a Action funcione corretamente.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Subi ele como uma action do github no marketplace, porém tomei esse erro: Error: File not found: '/home/runner/work/_actions/YuriBucci-Solfacil/workflow-slack-approve/main/dist/index.js'"
+  * **Ação/Resultado da IA:** Identifiquei que os arquivos compilados na pasta `dist/` estavam sendo ignorados pelo Git e modifiquei o `.gitignore` para incluí-los, commitando os arquivos necessários para o funcionamento da GitHub Action.
+
