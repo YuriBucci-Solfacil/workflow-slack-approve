@@ -160,3 +160,11 @@
   * **Prompt do Usuário:** "Ao receber o Approved ou Reject dispare na LOG que foi aprovado ou negado pelo usuário"
   * **Ação/Resultado da IA:** Adicionei mensagens destacadas nos logs que mostram claramente quando uma solicitação é aprovada ou rejeitada. Para aprovações, adicionei uma mensagem em verde com o prefixo "✅ APPROVED" ou "✅ PARTIAL APPROVAL" e o nome do usuário. Para rejeições, adicionei uma mensagem em vermelho com o prefixo "❌ REJECTED" e o nome do usuário. Isso torna imediatamente visível nos logs quando uma ação importante foi tomada e por quem.
 
+### Checkpoint: 21 - Implementação de timeout configurável
+* **GIT SHA:** `96adb3f50bbdacc1020d3a8178a309c67a16e152`
+* **Commit Message:** `AI: Added - Configurable timeout via timeout-minutes parameter`
+* **Notes/Observations:** Adição de um parâmetro configurável `timeout-minutes` para permitir que o usuário defina o tempo máximo de espera para aprovação. Anteriormente, o tempo de timeout era fixo em 10 minutos, mas agora pode ser configurado através do parâmetro `timeout-minutes` no workflow. O valor padrão continua sendo 10 minutos caso não seja especificado.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Ainda está com algum problema na contagem de tempo, o valor do lado direito deve ser o valor que eu definini no timeout exemplo: timeout-minutes: 5"
+  * **Ação/Resultado da IA:** Modifiquei o código para obter o valor de timeout do parâmetro `timeout-minutes` definido pelo usuário no workflow, em vez de usar um valor fixo de 10 minutos. Adicionei o parâmetro `timeout-minutes` ao arquivo `action.yml` com uma descrição clara e valor padrão de 10 minutos. Isso permite que o usuário configure facilmente o tempo máximo de espera para aprovação de acordo com suas necessidades.
+
