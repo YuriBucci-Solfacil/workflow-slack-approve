@@ -1,2 +1,3 @@
 node_modules/
 # dist/ é necessário para GitHub Actions
+lib/
