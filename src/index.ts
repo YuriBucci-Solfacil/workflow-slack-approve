@@ -365,7 +365,7 @@ async function run(): Promise<void> {
     // Tentar obter o ID do usuário pelo e-mail se não fornecido diretamente
     let finalUserId = user_id;
     let userEmailForDisplay = user_email;
-    
+
     if (!finalUserId && user_email) {
       logger.info(`Looking up user by email`);
       logger.debug(`Trying to find user ID for email: ${user_email}`);
@@ -456,7 +456,7 @@ async function run(): Promise<void> {
           const channelId = body.channel?.id;
 
           logger.info(`Approval request from user: ${userName}`);
-      logger.debug(`Approval request details - User ID: ${userId}, Channel ID: ${channelId}`);
+          logger.debug(`Approval request details - User ID: ${userId}, Channel ID: ${channelId}`);
 
           // Check if user is authorized to approve
           if (!userId) {
@@ -499,6 +499,7 @@ async function run(): Promise<void> {
           // Update the main message
           try {
             if (approveResult === "approved") {
+              console.log(chalk.green.bold(`[SUCCESS] `) + chalk.green(`✅ APPROVED: Request approved by ${userName}`));
               logger.info(`Request fully approved by ${userName}. Exiting with success.`);
               logger.debug(`Request fully approved by ${userName} (${userId}). Exiting with success.`);
 
@@ -530,6 +531,7 @@ async function run(): Promise<void> {
               });
 
             } else if (approveResult === "remainApproval") {
+              console.log(chalk.green.bold(`[SUCCESS] `) + chalk.green(`✅ PARTIAL APPROVAL: Request partially approved by ${userName}`));
               logger.info(`Partial approval by ${userName}. ${minimumApprovalCount - approvers.length} more approvals needed.`);
 
               await client.chat.update({
@@ -606,7 +608,8 @@ async function run(): Promise<void> {
           const userName = (body.user as any)?.name || (body.user as any)?.username || 'Unknown User';
           const channelId = body.channel?.id;
 
-          logger.info(`Rejection request from user: ${userName} (${userId}) in channel: ${channelId}`);
+          logger.info(`Rejection request from user: ${userName}`);
+          logger.debug(`Rejection request details - User ID: ${userId}, Channel ID: ${channelId}`);
 
           // Check if user ID exists
           if (!userId) {
@@ -616,7 +619,8 @@ async function run(): Promise<void> {
 
           // Check if user is authorized to reject (anyone in required approvers can reject)
           if (!requiredApprovers.includes(userId) && !approvers.includes(userId)) {
-            logger.warn(`Unauthorized rejection attempt by user: ${userName} (${userId})`);
+            logger.warn(`Unauthorized rejection attempt by user: ${userName}`);
+            logger.debug(`Unauthorized rejection attempt by user: ${userName} (${userId})`);
 
             // Send ephemeral message to user
             await client.chat.postEphemeral({
@@ -629,7 +633,8 @@ async function run(): Promise<void> {
 
           // Check if request is already fully approved
           if (approvers.length >= minimumApprovalCount) {
-            logger.info(`Rejection attempt by ${userName} after request was already approved`);
+            logger.warn(`Rejection attempt by ${userName} after request was already approved`);
+            logger.debug(`Rejection attempt by ${userName} (${userId}) after request was already approved`);
 
             // Send ephemeral message to user
             await client.chat.postEphemeral({
@@ -640,7 +645,9 @@ async function run(): Promise<void> {
             return;
           }
 
+          logger.error(`❌ REJECTED: Request rejected by ${userName}`);
           logger.info(`Request rejected by ${userName}. Exiting with failure.`);
+          logger.debug(`Request rejected by ${userName} (${userId}). Exiting with failure.`);
 
           // Update the main message with rejection
           try {
@@ -718,7 +725,7 @@ async function run(): Promise<void> {
       const timeoutMs = timeoutMinutes * 60 * 1000;
       const startTime = Date.now();
 
-            // Iniciar o contador de tempo
+      // Iniciar o contador de tempo
       const timer = setInterval(() => {
         const elapsedMs = Date.now() - startTime;
         const elapsedSeconds = Math.floor(elapsedMs / 1000);
@@ -731,14 +738,14 @@ async function run(): Promise<void> {
           // Formatar o tempo decorrido em minutos e segundos
           const elapsedMinutes = Math.floor(elapsedSeconds / 60);
           const elapsedSecondsDisplay = elapsedSeconds % 60;
-          const elapsedFormatted = elapsedMinutes > 0 
-            ? `${elapsedMinutes}m${elapsedSecondsDisplay}s` 
+          const elapsedFormatted = elapsedMinutes > 0
+            ? `${elapsedMinutes}m${elapsedSecondsDisplay}s`
             : `${elapsedSeconds}s`;
-          
+
           // Formatar o tempo restante
           const remainingMinutes = Math.floor(remainingMs / 60000);
           const remainingSeconds = Math.floor((remainingMs % 60000) / 1000);
-          
+
           logger.info(`Waiting for approval [${elapsedFormatted}/${remainingMinutes}m${remainingSeconds}s]`);
         }
       }, 5000); // Atualizar a cada 5 segundos
@@ -746,17 +753,17 @@ async function run(): Promise<void> {
       if (isDebugMode) {
         logger.debug("Debug information:");
         logger.debug(`- Unique step ID: ${unique_step_id}`);
-        
+
         // Mostrar emails dos aprovadores quando disponíveis
         const approversList = requiredApprovers.map(id => {
           const matchingEmail = rawApprovers.find(a => a.includes('@'));
           return matchingEmail || id;
         });
         logger.debug(`- Required approvers: ${approversList.join(", ")}`);
-        
+
         logger.debug(`- Minimum approval count: ${minimumApprovalCount}`);
         logger.debug(`- Target channel: ${channel_id || "None (using direct messages)"}`);
-        
+
         if (user_email) {
           logger.debug(`- Target user email: ${user_email}`);
         }

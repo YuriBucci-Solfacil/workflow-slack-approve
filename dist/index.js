@@ -486,6 +486,7 @@ function run() {
                     // Update the main message
                     try {
                         if (approveResult === "approved") {
+                            console.log(chalk_1.default.green.bold(`[SUCCESS] `) + chalk_1.default.green(`✅ APPROVED: Request approved by ${userName}`));
                             logger.info(`Request fully approved by ${userName}. Exiting with success.`);
                             logger.debug(`Request fully approved by ${userName} (${userId}). Exiting with success.`);
                             // Criar uma mensagem de sucesso personalizada que inclui o status de aprovação e uma mensagem de confirmação
@@ -515,6 +516,7 @@ function run() {
                             });
                         }
                         else if (approveResult === "remainApproval") {
+                            console.log(chalk_1.default.green.bold(`[SUCCESS] `) + chalk_1.default.green(`✅ PARTIAL APPROVAL: Request partially approved by ${userName}`));
                             logger.info(`Partial approval by ${userName}. ${minimumApprovalCount - approvers.length} more approvals needed.`);
                             yield client.chat.update({
                                 channel: channelId || targetChannelId,
@@ -581,7 +583,8 @@ function run() {
                     const userId = (_g = body.user) === null || _g === void 0 ? void 0 : _g.id;
                     const userName = ((_h = body.user) === null || _h === void 0 ? void 0 : _h.name) || ((_j = body.user) === null || _j === void 0 ? void 0 : _j.username) || 'Unknown User';
                     const channelId = (_k = body.channel) === null || _k === void 0 ? void 0 : _k.id;
-                    logger.info(`Rejection request from user: ${userName} (${userId}) in channel: ${channelId}`);
+                    logger.info(`Rejection request from user: ${userName}`);
+                    logger.debug(`Rejection request details - User ID: ${userId}, Channel ID: ${channelId}`);
                     // Check if user ID exists
                     if (!userId) {
                         logger.error("No user ID found in reject request body");
@@ -589,7 +592,8 @@ function run() {
                     }
                     // Check if user is authorized to reject (anyone in required approvers can reject)
                     if (!requiredApprovers.includes(userId) && !approvers.includes(userId)) {
-                        logger.warn(`Unauthorized rejection attempt by user: ${userName} (${userId})`);
+                        logger.warn(`Unauthorized rejection attempt by user: ${userName}`);
+                        logger.debug(`Unauthorized rejection attempt by user: ${userName} (${userId})`);
                         // Send ephemeral message to user
                         yield client.chat.postEphemeral({
                             channel: channelId || "",
@@ -600,7 +604,8 @@ function run() {
                     }
                     // Check if request is already fully approved
                     if (approvers.length >= minimumApprovalCount) {
-                        logger.info(`Rejection attempt by ${userName} after request was already approved`);
+                        logger.warn(`Rejection attempt by ${userName} after request was already approved`);
+                        logger.debug(`Rejection attempt by ${userName} (${userId}) after request was already approved`);
                         // Send ephemeral message to user
                         yield client.chat.postEphemeral({
                             channel: channelId || "",
@@ -609,7 +614,9 @@ function run() {
                         });
                         return;
                     }
+                    logger.error(`❌ REJECTED: Request rejected by ${userName}`);
                     logger.info(`Request rejected by ${userName}. Exiting with failure.`);
+                    logger.debug(`Request rejected by ${userName} (${userId}). Exiting with failure.`);
                     // Update the main message with rejection
                     try {
                         const rejectionBlocks = hasPayload(failMessagePayload)
