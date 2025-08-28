@@ -1,4 +1,4 @@
-name: elitenomad/slack-approval
+name: YuriBucci-Solfacil/slack-approval
 description: Custom action to send approval request to Slack from Github, allowing only specified approvers
 author: Pranava S Balugari
 runs:
