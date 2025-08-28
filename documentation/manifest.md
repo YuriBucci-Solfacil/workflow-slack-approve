@@ -40,3 +40,11 @@
   * **Prompt do Usuário:** "Subi ele como uma action do github no marketplace, porém tomei esse erro: Error: File not found: '/home/runner/work/_actions/YuriBucci-Solfacil/workflow-slack-approve/main/dist/index.js'"
   * **Ação/Resultado da IA:** Identifiquei que os arquivos compilados na pasta `dist/` estavam sendo ignorados pelo Git e modifiquei o `.gitignore` para incluí-los, commitando os arquivos necessários para o funcionamento da GitHub Action.
 
+### Checkpoint: 6 - Empacotamento de dependências para GitHub Action
+* **GIT SHA:** `11c418d3f2f672128b9ceaf304208d8ccecbf343`
+* **Commit Message:** `AI: Fixed - Bundle dependencies with ncc for GitHub Action`
+* **Notes/Observations:** Resolução do erro de módulos não encontrados usando o @vercel/ncc para empacotar o código e todas as suas dependências em um único arquivo JavaScript, seguindo as melhores práticas recomendadas pelo GitHub para Actions.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Run YuriBucci-Solfacil/workflow-slack-approve@main node:internal/modules/cjs/loader:1215 throw err; ^ Error: Cannot find module '@actions/core' Require stack: - /home/runner/work/_actions/YuriBucci-Solfacil/workflow-slack-approve/main/dist/index.js"
+  * **Ação/Resultado da IA:** Implementei uma solução usando o @vercel/ncc para empacotar o código TypeScript compilado junto com todas as suas dependências em um único arquivo JavaScript, modificando o processo de build e a estrutura do projeto para seguir as recomendações do GitHub para Actions.
+

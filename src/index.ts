@@ -8,6 +8,12 @@ const slackAppToken = process.env.SLACK_APP_TOKEN || "";
 const channel_id = process.env.SLACK_CHANNEL_ID || "";
 const user_id = process.env.SLACK_USER_ID || "";
 const user_email = process.env.SLACK_USER_EMAIL || "";
+
+// Verificando se SLACK_CHANNEL_ID foi fornecido (obrigatório)
+if (!channel_id) {
+  console.error("Error: SLACK_CHANNEL_ID environment variable is required. Please set it to a valid Slack channel ID.");
+  process.exit(1);
+}
 const unique_step_id = process.env.UNIQUE_STEP_ID || "";
 console.log("unique_step_id", unique_step_id);
 const baseMessageTs = core.getInput("baseMessageTs");
@@ -210,23 +216,32 @@ async function run(): Promise<void> {
     // Função para obter o ID do canal da mensagem direta
     async function getDirectMessageChannel(userID: string) {
       if (!userID) {
+        console.log("No user ID provided. Using channel instead.");
         return channel_id; // Volta para o canal do grupo se o ID do usuário não estiver disponível
       }
 
       try {
+        // Verifica se o bot tem as permissões necessárias
+        console.log(`Attempting to open direct message with user: ${userID}`);
+        
         // Abre uma conversa direta com o usuário
         const conversationResponse = await web.conversations.open({
           users: userID
         });
 
         if (conversationResponse.ok && conversationResponse.channel?.id) {
+          console.log(`Successfully opened direct message channel: ${conversationResponse.channel.id}`);
           return conversationResponse.channel.id;
         } else {
-          console.warn("Failed to open direct message channel. Falling back to group channel.");
+          console.warn(`Failed to open direct message channel: ${JSON.stringify(conversationResponse.error || "Unknown error")}`);
+          console.warn("Make sure your Slack app has the 'im:write' scope enabled");
+          console.warn("Falling back to group channel");
           return channel_id;
         }
       } catch (error) {
         console.error(`Error opening direct message: ${error}`);
+        console.warn("This may be due to missing 'im:write' scope. Please add this scope to your Slack app");
+        console.warn("Falling back to group channel:", channel_id);
         return channel_id; // Volta para o canal do grupo em caso de erro
       }
     }
@@ -242,6 +257,18 @@ async function run(): Promise<void> {
       } else {
         console.warn(`Could not resolve email ${user_email} to a Slack user ID. Falling back to channel.`);
       }
+    }
+
+    // Verificar se o canal do grupo existe
+    try {
+      await web.conversations.info({
+        channel: channel_id
+      });
+      console.log(`Channel ${channel_id} exists and is accessible.`);
+    } catch (error) {
+      console.error(`Error: The fallback channel ${channel_id} does not exist or bot doesn't have access to it. Please ensure the SLACK_CHANNEL_ID is correct and the bot is invited to the channel.`);
+      console.error(`Error details: ${error}`);
+      process.exit(1);
     }
 
     // Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
