@@ -70,9 +70,13 @@ jobs:
           SLACK_APP_TOKEN: ${{ secrets.SLACK_APP_TOKEN }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-          # Use SLACK_CHANNEL_ID para grupo ou SLACK_USER_ID para mensagem direta
+          # Use apenas UMA das três opções abaixo:
+          # Opção 1: Canal do Slack (grupo)
           SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-          # SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }} # Descomente para mensagem direta
+          # Opção 2: ID do usuário do Slack (mensagem direta)
+          # SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
+          # Opção 3: Email do usuário do Slack (mensagem direta)
+          # SLACK_USER_EMAIL: ${{ secrets.SLACK_USER_EMAIL }}
           UNIQUE_STEP_ID: "1234"
         timeout-minutes: 5
         with:
@@ -100,10 +104,11 @@ jobs:
 
     - Signing Secret on `Basic Information page`.
 
-  - `SLACK_CHANNEL_ID` ou `SLACK_USER_ID`
+  - `SLACK_CHANNEL_ID`, `SLACK_USER_ID` ou `SLACK_USER_EMAIL` (use apenas uma destas opções)
 
     - `SLACK_CHANNEL_ID`: Channel ID for which you want to send approval.
     - `SLACK_USER_ID`: User ID to send direct message approval (use this instead of SLACK_CHANNEL_ID for private messages).
+    - `SLACK_USER_EMAIL`: Email address of the Slack user to send direct message approval. The app will automatically lookup the user ID based on this email.
 
   - `UNIQUE_STEP_ID`
 

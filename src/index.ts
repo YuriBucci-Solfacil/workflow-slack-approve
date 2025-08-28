@@ -7,6 +7,7 @@ const signingSecret = process.env.SLACK_SIGNING_SECRET || "";
 const slackAppToken = process.env.SLACK_APP_TOKEN || "";
 const channel_id = process.env.SLACK_CHANNEL_ID || "";
 const user_id = process.env.SLACK_USER_ID || "";
+const user_email = process.env.SLACK_USER_EMAIL || "";
 const unique_step_id = process.env.UNIQUE_STEP_ID || "";
 console.log("unique_step_id", unique_step_id);
 const baseMessageTs = core.getInput("baseMessageTs");
@@ -67,11 +68,10 @@ async function run(): Promise<void> {
           type: "mrkdwn",
           text: `*Required Approvers Count:* ${minimumApprovalCount}\n*Remaining Approvers:* ${requiredApprovers
             .map((v) => `<@${v}>`)
-            .join(", ")}\n${
-            approvers.length > 0
+            .join(", ")}\n${approvers.length > 0
               ? `Approvers: ${approvers.map((v) => `<@${v}>`).join(", ")} `
               : ""
-          }\n`,
+            }\n`,
         },
       };
     };
@@ -79,7 +79,7 @@ async function run(): Promise<void> {
     const renderApprovalButtons = () => {
       const remainingApprovals = minimumApprovalCount - approvers.length;
       const isFullyApproved = approvers.length >= minimumApprovalCount;
-      
+
       if (!isFullyApproved) {
         return {
           type: "actions",
@@ -109,7 +109,7 @@ async function run(): Promise<void> {
           ],
         };
       }
-      
+
       return {
         type: "section",
         text: {
@@ -121,52 +121,52 @@ async function run(): Promise<void> {
 
     const mainMessagePayload = hasPayload(baseMessagePayload)
       ? {
-          ...baseMessagePayload,
-          text: baseMessagePayload.text || "GitHub Actions Approval Request #${unique_step_id}",
-          blocks: [...baseMessagePayload.blocks, renderApprovalStatus(), renderApprovalButtons()]
-        }
+        ...baseMessagePayload,
+        text: baseMessagePayload.text || "GitHub Actions Approval Request #${unique_step_id}",
+        blocks: [...baseMessagePayload.blocks, renderApprovalStatus(), renderApprovalButtons()]
+      }
       : {
-          blocks: [
-            {
-              type: "section",
-              text: {
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "GitHub Actions Approval Request",
+            },
+          },
+          {
+            type: "section",
+            fields: [
+              {
                 type: "mrkdwn",
-                text: "GitHub Actions Approval Request",
+                text: `*GitHub Actor:*\n${actor}`,
               },
-            },
-            {
-              type: "section",
-              fields: [
-                {
-                  type: "mrkdwn",
-                  text: `*GitHub Actor:*\n${actor}`,
-                },
-                {
-                  type: "mrkdwn",
-                  text: `*Repos:*\n${github_server_url}/${github_repos}`,
-                },
-                {
-                  type: "mrkdwn",
-                  text: `*Actions URL:*\n${actionsUrl}`,
-                },
-                {
-                  type: "mrkdwn",
-                  text: `*GITHUB_RUN_ID:*\n${run_id}`,
-                },
-                {
-                  type: "mrkdwn",
-                  text: `*Workflow:*\n${workflow}`,
-                },
-                {
-                  type: "mrkdwn",
-                  text: `*RunnerOS:*\n${runnerOS}`,
-                },
-              ],
-            },
-            renderApprovalStatus(),
-            renderApprovalButtons(),
-          ],
-        };
+              {
+                type: "mrkdwn",
+                text: `*Repos:*\n${github_server_url}/${github_repos}`,
+              },
+              {
+                type: "mrkdwn",
+                text: `*Actions URL:*\n${actionsUrl}`,
+              },
+              {
+                type: "mrkdwn",
+                text: `*GITHUB_RUN_ID:*\n${run_id}`,
+              },
+              {
+                type: "mrkdwn",
+                text: `*Workflow:*\n${workflow}`,
+              },
+              {
+                type: "mrkdwn",
+                text: `*RunnerOS:*\n${runnerOS}`,
+              },
+            ],
+          },
+          renderApprovalStatus(),
+          renderApprovalButtons(),
+        ],
+      };
 
     function approve(userId: string) {
       const idx = requiredApprovers.findIndex((user) => user === userId);
@@ -183,43 +183,80 @@ async function run(): Promise<void> {
       return "approved";
     }
 
-    // Função para obter o ID do canal da mensagem direta
-async function getDirectMessageChannel(userID: string) {
-  if (!userID) {
-    return channel_id; // Volta para o canal do grupo se o ID do usuário não estiver disponível
+    // Função para buscar o ID do usuário pelo e-mail
+async function getUserIdByEmail(email: string): Promise<string | null> {
+  if (!email) {
+    return null;
   }
-  
+
   try {
-    // Abre uma conversa direta com o usuário
-    const conversationResponse = await web.conversations.open({
-      users: userID
+    const response = await web.users.lookupByEmail({
+      email: email
     });
-    
-    if (conversationResponse.ok && conversationResponse.channel?.id) {
-      return conversationResponse.channel.id;
+
+    if (response.ok && response.user && response.user.id) {
+      console.log(`Found user ID ${response.user.id} for email ${email}`);
+      return response.user.id;
     } else {
-      console.warn("Failed to open direct message channel. Falling back to group channel.");
-      return channel_id;
+      console.warn(`Failed to find user with email ${email}`);
+      return null;
     }
   } catch (error) {
-    console.error(`Error opening direct message: ${error}`);
-    return channel_id; // Volta para o canal do grupo em caso de erro
+    console.error(`Error looking up user by email: ${error}`);
+    return null;
+  }
+}
+
+// Função para obter o ID do canal da mensagem direta
+async function getDirectMessageChannel(userID: string) {
+      if (!userID) {
+        return channel_id; // Volta para o canal do grupo se o ID do usuário não estiver disponível
+      }
+
+      try {
+        // Abre uma conversa direta com o usuário
+        const conversationResponse = await web.conversations.open({
+          users: userID
+        });
+
+        if (conversationResponse.ok && conversationResponse.channel?.id) {
+          return conversationResponse.channel.id;
+        } else {
+          console.warn("Failed to open direct message channel. Falling back to group channel.");
+          return channel_id;
+        }
+      } catch (error) {
+        console.error(`Error opening direct message: ${error}`);
+        return channel_id; // Volta para o canal do grupo em caso de erro
+      }
+    }
+
+    // Tentar obter o ID do usuário pelo e-mail se não fornecido diretamente
+let finalUserId = user_id;
+if (!finalUserId && user_email) {
+  console.log(`Trying to find user ID for email: ${user_email}`);
+  const emailLookupResult = await getUserIdByEmail(user_email);
+  if (emailLookupResult) {
+    finalUserId = emailLookupResult;
+    console.log(`Successfully resolved email ${user_email} to user ID ${finalUserId}`);
+  } else {
+    console.warn(`Could not resolve email ${user_email} to a Slack user ID. Falling back to channel.`);
   }
 }
 
 // Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
-const targetChannelId = user_id ? await getDirectMessageChannel(user_id) : channel_id;
+const targetChannelId = finalUserId ? await getDirectMessageChannel(finalUserId) : channel_id;
 
-const mainMessage = baseMessageTs
+    const mainMessage = baseMessageTs
       ? await web.chat.update({
-          channel: targetChannelId,
-          ts: baseMessageTs,
-          ...mainMessagePayload,
-        })
+        channel: targetChannelId,
+        ts: baseMessageTs,
+        ...mainMessagePayload,
+      })
       : await web.chat.postMessage({
-          channel: targetChannelId,
-          ...mainMessagePayload,
-        });
+        channel: targetChannelId,
+        ...mainMessagePayload,
+      });
 
     core.setOutput("mainMessageTs", mainMessage.ts);
 
@@ -241,35 +278,35 @@ const mainMessage = baseMessageTs
       async ({ ack, client, body, logger, action }) => {
         try {
           await ack();
-          
+
           // Validate action type
           if (action.type !== "button") {
             logger.warn(`Invalid action type: ${action.type}`);
             return;
           }
-          
+
           // Validate action value
           if (action.value !== aid) {
             logger.warn(`Invalid action value: ${action.value}, expected: ${aid}`);
             return;
           }
-          
+
           const userId = body.user?.id;
           const userName = (body.user as any)?.name || (body.user as any)?.username || 'Unknown User';
           const channelId = body.channel?.id;
-          
+
           logger.info(`Approval request from user: ${userName} (${userId}) in channel: ${channelId}`);
-          
+
           // Check if user is authorized to approve
           if (!userId) {
             logger.error("No user ID found in request body");
             return;
           }
-          
+
           // Check if user has already approved
           if (approvers.includes(userId)) {
             logger.info(`User ${userName} (${userId}) has already approved`);
-            
+
             // Send ephemeral message to user
             await client.chat.postEphemeral({
               channel: channelId || "",
@@ -278,11 +315,11 @@ const mainMessage = baseMessageTs
             });
             return;
           }
-          
+
           // Check if user is in the required approvers list
           if (!requiredApprovers.includes(userId)) {
             logger.warn(`Unauthorized approval attempt by user: ${userName} (${userId})`);
-            
+
             // Send ephemeral message to user
             await client.chat.postEphemeral({
               channel: channelId || "",
@@ -291,15 +328,15 @@ const mainMessage = baseMessageTs
             });
             return;
           }
-          
+
           const approveResult = approve(userId);
           logger.info(`Approval result for ${userName}: ${approveResult}`);
-          
+
           // Update the main message
           try {
             if (approveResult === "approved") {
               logger.info(`Request fully approved by ${userName}. Exiting with success.`);
-              
+
               await client.chat.update({
                 ts: mainMessage.ts || "",
                 channel: channelId || targetChannelId,
@@ -307,10 +344,10 @@ const mainMessage = baseMessageTs
                   ? successMessagePayload
                   : mainMessagePayload),
               });
-              
+
             } else if (approveResult === "remainApproval") {
               logger.info(`Partial approval by ${userName}. ${minimumApprovalCount - approvers.length} more approvals needed.`);
-              
+
               await client.chat.update({
                 channel: channelId || targetChannelId,
                 ts: mainMessage?.ts || "",
@@ -321,13 +358,13 @@ const mainMessage = baseMessageTs
                   renderApprovalButtons(),
                 ],
               });
-              
+
             } else {
               logger.warn(`Unexpected approval result: ${approveResult}`);
             }
           } catch (updateError) {
             logger.error(`Failed to update message: ${updateError}`);
-            
+
             // Send error notification to user
             await client.chat.postEphemeral({
               channel: channelId || "",
@@ -335,20 +372,20 @@ const mainMessage = baseMessageTs
               text: "❌ Failed to update the approval message. Please try again.",
             });
           }
-          
+
           // Exit if fully approved
           if (approveResult === "approved") {
             process.exit(0);
           }
-          
+
         } catch (error) {
           logger.error(`Error in approval action handler: ${error}`);
-          
+
           // Try to send error notification to user if possible
           try {
             const userId = body.user?.id;
             const channelId = body.channel?.id;
-            
+
             if (userId && channelId) {
               await client.chat.postEphemeral({
                 channel: channelId,
@@ -368,35 +405,35 @@ const mainMessage = baseMessageTs
       async ({ ack, client, body, logger, action }) => {
         try {
           await ack();
-          
+
           // Validate action type
           if (action.type !== "button") {
             logger.warn(`Invalid reject action type: ${action.type}`);
             return;
           }
-          
+
           // Validate action value
           if (action.value !== aid) {
             logger.warn(`Invalid reject action value: ${action.value}, expected: ${aid}`);
             return;
           }
-          
+
           const userId = body.user?.id;
           const userName = (body.user as any)?.name || (body.user as any)?.username || 'Unknown User';
           const channelId = body.channel?.id;
-          
+
           logger.info(`Rejection request from user: ${userName} (${userId}) in channel: ${channelId}`);
-          
+
           // Check if user ID exists
           if (!userId) {
             logger.error("No user ID found in reject request body");
             return;
           }
-          
+
           // Check if user is authorized to reject (anyone in required approvers can reject)
           if (!requiredApprovers.includes(userId) && !approvers.includes(userId)) {
             logger.warn(`Unauthorized rejection attempt by user: ${userName} (${userId})`);
-            
+
             // Send ephemeral message to user
             await client.chat.postEphemeral({
               channel: channelId || "",
@@ -405,11 +442,11 @@ const mainMessage = baseMessageTs
             });
             return;
           }
-          
+
           // Check if request is already fully approved
           if (approvers.length >= minimumApprovalCount) {
             logger.info(`Rejection attempt by ${userName} after request was already approved`);
-            
+
             // Send ephemeral message to user
             await client.chat.postEphemeral({
               channel: channelId || "",
@@ -418,9 +455,9 @@ const mainMessage = baseMessageTs
             });
             return;
           }
-          
+
           logger.info(`Request rejected by ${userName}. Exiting with failure.`);
-          
+
           // Update the main message with rejection
           try {
             await client.chat.update({
@@ -440,10 +477,10 @@ const mainMessage = baseMessageTs
                 ],
               }),
             });
-            
+
           } catch (updateError) {
             logger.error(`Failed to update message with rejection: ${updateError}`);
-            
+
             // Send error notification to user
             await client.chat.postEphemeral({
               channel: channelId || "",
@@ -451,18 +488,18 @@ const mainMessage = baseMessageTs
               text: "❌ Failed to update the rejection message. The request will still be rejected.",
             });
           }
-          
+
           // Exit with failure code
           process.exit(1);
-          
+
         } catch (error) {
           logger.error(`Error in rejection action handler: ${error}`);
-          
+
           // Try to send error notification to user if possible
           try {
             const userId = body.user?.id;
             const channelId = body.channel?.id;
-            
+
             if (userId && channelId) {
               await client.chat.postEphemeral({
                 channel: channelId,
@@ -473,7 +510,7 @@ const mainMessage = baseMessageTs
           } catch (ephemeralError) {
             logger.error(`Failed to send error notification: ${ephemeralError}`);
           }
-          
+
           // Still exit with failure even if there was an error
           process.exit(1);
         }
