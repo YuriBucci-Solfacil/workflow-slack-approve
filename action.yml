@@ -14,7 +14,7 @@ inputs:
     required: false
     default: ""
   approvers:
-    description: "A comma-separated list of approvers' slack user ids"
+    description: "A comma-separated list of approvers' Slack user IDs or email addresses. When using email addresses, the Slack app needs users:read.email scope."
     required: true
   minimumApprovalCount:
     description: "The minimum number of approvals required"

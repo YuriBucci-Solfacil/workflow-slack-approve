@@ -17,13 +17,20 @@ if (!channel_id) {
 const unique_step_id = process.env.UNIQUE_STEP_ID || "";
 console.log("unique_step_id", unique_step_id);
 const baseMessageTs = core.getInput("baseMessageTs");
-const requiredApprovers = core
+// Lista original de aprovadores (pode conter IDs ou e-mails)
+const rawApprovers = core
   .getInput("approvers", { required: true, trimWhitespace: true })
   ?.split(",");
+
+// Array para armazenar os IDs dos aprovadores (serão preenchidos posteriormente)
+const requiredApprovers: string[] = [];
+
 const minimumApprovalCount = Number(core.getInput("minimumApprovalCount")) || 1;
 const baseMessagePayload = JSON.parse(
   core.getMultilineInput("baseMessagePayload").join("")
 );
+
+// Array para armazenar os IDs dos usuários que já aprovaram
 const approvers: string[] = [];
 
 const successMessagePayload = JSON.parse(
@@ -55,6 +62,53 @@ function hasPayload(inputs: any) {
 async function run(): Promise<void> {
   try {
     const web = new WebClient(token);
+    
+    // Função para resolver e-mail para ID de usuário
+    async function resolveEmailToUserId(email: string): Promise<string | null> {
+      try {
+        console.log(`Looking up Slack user ID for email: ${email}`);
+        const response = await web.users.lookupByEmail({
+          email: email
+        });
+        
+        if (response.ok && response.user && response.user.id) {
+          console.log(`Successfully resolved email ${email} to Slack user ID: ${response.user.id}`);
+          return response.user.id;
+        } else {
+          console.warn(`Failed to find Slack user ID for email: ${email}`);
+          return null;
+        }
+      } catch (error) {
+        console.error(`Error looking up user by email: ${error}`);
+        return null;
+      }
+    }
+    
+    // Resolver os e-mails dos aprovadores para IDs de usuário do Slack
+    for (const approver of rawApprovers) {
+      approver.trim();
+      // Se parece um e-mail, tente resolver para ID
+      if (approver.includes('@')) {
+        console.log(`Approver ${approver} appears to be an email, attempting to resolve to Slack user ID`);
+        const userId = await resolveEmailToUserId(approver);
+        if (userId) {
+          requiredApprovers.push(userId);
+          console.log(`Added ${approver} => ${userId} to approvers list`);
+        } else {
+          console.warn(`Could not resolve email ${approver} to a Slack user ID. This approver won't be able to authorize.`);
+        }
+      } else {
+        // Assumir que é um ID de usuário do Slack
+        requiredApprovers.push(approver);
+        console.log(`Added direct Slack user ID ${approver} to approvers list`);
+      }
+    }
+    
+    // Verificar se há aprovadores válidos após a resolução
+    if (requiredApprovers.length === 0) {
+      console.error("Error: No valid approvers found. Please check the approvers list and ensure emails can be resolved to Slack user IDs.");
+      process.exit(1);
+    }
 
     const github_server_url = process.env.GITHUB_SERVER_URL || "";
     const github_repos = process.env.GITHUB_REPOSITORY || "";
@@ -223,7 +277,7 @@ async function run(): Promise<void> {
       try {
         // Verifica se o bot tem as permissões necessárias
         console.log(`Attempting to open direct message with user: ${userID}`);
-        
+
         // Abre uma conversa direta com o usuário
         const conversationResponse = await web.conversations.open({
           users: userID

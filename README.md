@@ -80,7 +80,7 @@ jobs:
           UNIQUE_STEP_ID: "1234"
         timeout-minutes: 5
         with:
-            approvers: user1,user2
+            approvers: U12345678,user.name@example.com
             minimumApprovalCount: 2
             baseMessagePayload: |
               {}
@@ -121,7 +121,8 @@ jobs:
     - Optional
 
   - `approvers`
-    - A comma-separated list of approvers' slack user ids
+    - A comma-separated list of approvers' Slack user IDs or email addresses
+    - When using email addresses, the app will automatically convert them to Slack user IDs (requires the `users:read.email` scope)
     - Required
 
   - `minimumApprovalCount`
