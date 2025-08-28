@@ -152,3 +152,11 @@
   * **Prompt do Usuário:** "Porque ele ta trazendo 2 IDS diferentes? Ao invés disso também o ID deve ser exebido somente no modo debug, ao invés disso coloque o e-mail do usuário"
   * **Ação/Resultado da IA:** Modifiquei o sistema de logs para exibir apenas informações amigáveis (nomes de usuário, e-mails) nos logs padrão e mover todos os IDs técnicos (user IDs, channel IDs) para o modo debug. Também implementei a exibição de e-mails em vez de IDs quando disponíveis, tornando os logs mais legíveis e privados por padrão, enquanto mantém todas as informações técnicas disponíveis para depuração quando necessário.
 
+### Checkpoint: 20 - Adição de mensagens claras de aprovação/rejeição nos logs
+* **GIT SHA:** `9f64b79215c890440f88fb52792c3b46ccc198cc`
+* **Commit Message:** `AI: Added - Clear approval/rejection status messages in logs`
+* **Notes/Observations:** Implementação de mensagens destacadas nos logs para indicar claramente quando uma solicitação é aprovada ou rejeitada. Agora, quando um usuário aprova ou rejeita uma solicitação, uma mensagem destacada é exibida nos logs com um emoji e o nome do usuário que realizou a ação, tornando mais fácil identificar visualmente o status da solicitação.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Ao receber o Approved ou Reject dispare na LOG que foi aprovado ou negado pelo usuário"
+  * **Ação/Resultado da IA:** Adicionei mensagens destacadas nos logs que mostram claramente quando uma solicitação é aprovada ou rejeitada. Para aprovações, adicionei uma mensagem em verde com o prefixo "✅ APPROVED" ou "✅ PARTIAL APPROVAL" e o nome do usuário. Para rejeições, adicionei uma mensagem em vermelho com o prefixo "❌ REJECTED" e o nome do usuário. Isso torna imediatamente visível nos logs quando uma ação importante foi tomada e por quem.
+
