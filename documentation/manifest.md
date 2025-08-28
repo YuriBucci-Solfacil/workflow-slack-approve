@@ -56,3 +56,11 @@
   * **Prompt do Usuário:** [Imagem de uma tela mostrando o problema de autorização] "Tentei aprovar: [WARN] bolt-app Unauthorized approval attempt by user: yuri.bucci (U08534M0R3Q)"
   * **Ação/Resultado da IA:** Identifiquei que o problema estava na forma como os aprovadores são especificados. Modifiquei o código para permitir que os aprovadores sejam especificados usando endereços de e-mail, que são então convertidos para IDs de usuário do Slack no início da execução do script, permitindo a aprovação por usuários sem conhecer seus IDs do Slack.
 
+### Checkpoint: 8 - Remoção da obrigatoriedade do SLACK_CHANNEL_ID
+* **GIT SHA:** `8f3b08b7d973b84783d4a6d40f2b678332f91be6`
+* **Commit Message:** `AI: Changed - Made SLACK_CHANNEL_ID optional when using direct messages`
+* **Notes/Observations:** Modificação do código para que a variável de ambiente `SLACK_CHANNEL_ID` não seja mais obrigatória quando estiver usando mensagens diretas. Isso permite que a action seja usada exclusivamente com mensagens diretas, sem a necessidade de um canal de grupo para fallback.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Por favor tire a obrigatoriedade desse `Error: SLACK_CHANNEL_ID environment variable is required. Please set it to a valid Slack channel ID.` Visto que não usando channel neste momento apenas mensagem direta"
+  * **Ação/Resultado da IA:** Modifiquei o código para tornar a variável `SLACK_CHANNEL_ID` opcional quando `SLACK_USER_ID` ou `SLACK_USER_EMAIL` estiver definido. Atualizei o sistema para verificar pelo menos uma forma válida de enviar mensagens e melhorei o tratamento de erros para lidar com configurações sem canal de fallback.
+
