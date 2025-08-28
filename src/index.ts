@@ -309,7 +309,7 @@ async function run(): Promise<void> {
     }
 
     // Função para obter o ID do canal da mensagem direta
-    async function getDirectMessageChannel(userID: string) {
+    async function getDirectMessageChannel(userID: string, userEmail: string = "") {
       if (!userID) {
         if (channel_id) {
           logger.info("No user ID provided. Using channel instead.");
@@ -322,7 +322,9 @@ async function run(): Promise<void> {
 
       try {
         // Verifica se o bot tem as permissões necessárias
-        logger.info(`Attempting to open direct message with user: ${userID}`);
+        const displayIdentifier = userEmail || "user";
+        logger.info(`Attempting to open direct message with ${displayIdentifier}`);
+        logger.debug(`Opening direct message with user ID: ${userID}`);
 
         // Abre uma conversa direta com o usuário
         const conversationResponse = await web.conversations.open({
@@ -330,10 +332,13 @@ async function run(): Promise<void> {
         });
 
         if (conversationResponse.ok && conversationResponse.channel?.id) {
-          logger.success(`Successfully opened direct message channel: ${conversationResponse.channel.id}`);
-          return conversationResponse.channel.id;
+          const channelId = conversationResponse.channel.id;
+          logger.success(`Successfully opened direct message channel`);
+          logger.debug(`Direct message channel ID: ${channelId}`);
+          return channelId;
         } else {
-          logger.warn(`Failed to open direct message channel: ${JSON.stringify(conversationResponse.error || "Unknown error")}`);
+          logger.warn(`Failed to open direct message channel`);
+          logger.debug(`Error details: ${JSON.stringify(conversationResponse.error || "Unknown error")}`);
           logger.warn("Make sure your Slack app has the 'im:write' scope enabled");
           if (channel_id) {
             logger.warn("Falling back to group channel");
@@ -347,7 +352,8 @@ async function run(): Promise<void> {
         logger.error(`Error opening direct message: ${error}`);
         logger.warn("This may be due to missing 'im:write' scope. Please add this scope to your Slack app");
         if (channel_id) {
-          logger.warn(`Falling back to group channel: ${channel_id}`);
+          logger.warn(`Falling back to group channel`);
+          logger.debug(`Fallback channel ID: ${channel_id}`);
           return channel_id; // Volta para o canal do grupo em caso de erro se um canal foi configurado
         } else {
           logger.error("No fallback channel provided. Unable to send message.");
@@ -358,14 +364,19 @@ async function run(): Promise<void> {
 
     // Tentar obter o ID do usuário pelo e-mail se não fornecido diretamente
     let finalUserId = user_id;
+    let userEmailForDisplay = user_email;
+    
     if (!finalUserId && user_email) {
+      logger.info(`Looking up user by email`);
       logger.debug(`Trying to find user ID for email: ${user_email}`);
       const emailLookupResult = await getUserIdByEmail(user_email);
       if (emailLookupResult) {
         finalUserId = emailLookupResult;
+        logger.success(`Successfully resolved user email`);
         logger.debug(`Successfully resolved email ${user_email} to user ID ${finalUserId}`);
       } else {
-        logger.warn(`Could not resolve email ${user_email} to a Slack user ID. Falling back to channel.`);
+        logger.warn(`Could not resolve email to a Slack user ID. Falling back to channel.`);
+        logger.debug(`Failed to resolve email: ${user_email}`);
       }
     }
 
@@ -377,8 +388,8 @@ async function run(): Promise<void> {
         });
         logger.debug(`Channel ${channel_id} exists and is accessible.`);
       } catch (error) {
-        logger.error(`The fallback channel ${channel_id} does not exist or bot doesn't have access to it. Please ensure the SLACK_CHANNEL_ID is correct and the bot is invited to the channel.`);
-        logger.debug(`Error details: ${error}`);
+        logger.error(`The fallback channel does not exist or bot doesn't have access to it. Please ensure the SLACK_CHANNEL_ID is correct and the bot is invited to the channel.`);
+        logger.debug(`Error details for channel ${channel_id}: ${error}`);
         // Só vamos sair se não tivermos um ID de usuário válido, pois podemos tentar enviar diretamente sem usar o canal
         if (!finalUserId) {
           process.exit(1);
@@ -387,11 +398,11 @@ async function run(): Promise<void> {
         }
       }
     } else {
-      logger.debug("No channel ID provided. Using direct messages only without fallback.");
+      logger.info("No channel ID provided. Using direct messages only without fallback.");
     }
 
     // Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
-    const targetChannelId = finalUserId ? await getDirectMessageChannel(finalUserId) : channel_id;
+    const targetChannelId = finalUserId ? await getDirectMessageChannel(finalUserId, userEmailForDisplay) : channel_id;
 
     const mainMessage = baseMessageTs
       ? await web.chat.update({
@@ -444,7 +455,8 @@ async function run(): Promise<void> {
           const userName = (body.user as any)?.name || (body.user as any)?.username || 'Unknown User';
           const channelId = body.channel?.id;
 
-          logger.info(`Approval request from user: ${userName} (${userId}) in channel: ${channelId}`);
+          logger.info(`Approval request from user: ${userName}`);
+      logger.debug(`Approval request details - User ID: ${userId}, Channel ID: ${channelId}`);
 
           // Check if user is authorized to approve
           if (!userId) {
@@ -454,7 +466,8 @@ async function run(): Promise<void> {
 
           // Check if user has already approved
           if (approvers.includes(userId)) {
-            logger.info(`User ${userName} (${userId}) has already approved`);
+            logger.info(`User ${userName} has already approved`);
+            logger.debug(`User ${userName} (${userId}) has already approved`);
 
             // Send ephemeral message to user
             await client.chat.postEphemeral({
@@ -467,7 +480,8 @@ async function run(): Promise<void> {
 
           // Check if user is in the required approvers list
           if (!requiredApprovers.includes(userId)) {
-            logger.warn(`Unauthorized approval attempt by user: ${userName} (${userId})`);
+            logger.warn(`Unauthorized approval attempt by user: ${userName}`);
+            logger.debug(`Unauthorized approval attempt by user: ${userName} (${userId})`);
 
             // Send ephemeral message to user
             await client.chat.postEphemeral({
@@ -480,11 +494,13 @@ async function run(): Promise<void> {
 
           const approveResult = approve(userId);
           logger.info(`Approval result for ${userName}: ${approveResult}`);
+          logger.debug(`Approval result for ${userName} (${userId}): ${approveResult}`);
 
           // Update the main message
           try {
             if (approveResult === "approved") {
               logger.info(`Request fully approved by ${userName}. Exiting with success.`);
+              logger.debug(`Request fully approved by ${userName} (${userId}). Exiting with success.`);
 
               // Criar uma mensagem de sucesso personalizada que inclui o status de aprovação e uma mensagem de confirmação
               const successBlocks = hasPayload(successMessagePayload)
@@ -702,7 +718,7 @@ async function run(): Promise<void> {
       const timeoutMs = timeoutMinutes * 60 * 1000;
       const startTime = Date.now();
 
-      // Iniciar o contador de tempo
+            // Iniciar o contador de tempo
       const timer = setInterval(() => {
         const elapsedMs = Date.now() - startTime;
         const elapsedSeconds = Math.floor(elapsedMs / 1000);
@@ -730,9 +746,20 @@ async function run(): Promise<void> {
       if (isDebugMode) {
         logger.debug("Debug information:");
         logger.debug(`- Unique step ID: ${unique_step_id}`);
-        logger.debug(`- Required approvers: ${requiredApprovers.join(", ")}`);
+        
+        // Mostrar emails dos aprovadores quando disponíveis
+        const approversList = requiredApprovers.map(id => {
+          const matchingEmail = rawApprovers.find(a => a.includes('@'));
+          return matchingEmail || id;
+        });
+        logger.debug(`- Required approvers: ${approversList.join(", ")}`);
+        
         logger.debug(`- Minimum approval count: ${minimumApprovalCount}`);
         logger.debug(`- Target channel: ${channel_id || "None (using direct messages)"}`);
+        
+        if (user_email) {
+          logger.debug(`- Target user email: ${user_email}`);
+        }
       }
     })();
   } catch (error) {
