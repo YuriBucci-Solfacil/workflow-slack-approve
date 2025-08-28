@@ -149,5 +149,5 @@ outputs:
 # SLACK_USER_ID - Target Slack user ID for direct message 
 # SLACK_USER_EMAIL - Target Slack user email (will be converted to user ID automatically)
 # NOTE: For SLACK_USER_EMAIL functionality, your Slack app needs users:read.email and im:write scopes
-# UNIQUE_STEP_ID - Unique identifier for this approval step (Optional, will be auto-generated if not provided)
+# Note: UNIQUE_STEP_ID is now automatically generated and no longer needs to be provided
 
