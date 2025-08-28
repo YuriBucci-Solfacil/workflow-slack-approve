@@ -720,8 +720,9 @@ async function run(): Promise<void> {
       await app.start(3000);
       logger.info("Slack approval message sent. Check your Slack notifications.");
 
-      // Obter o tempo máximo de espera do input ou usar o padrão do GitHub Actions
-      const timeoutMinutes = Number(core.getInput("timeout-minutes")) || 10;
+      // Usar o valor padrão de 10 minutos para o timeout
+      // O GitHub Actions já gerencia o timeout-minutes no nível do workflow
+      const timeoutMinutes = 10;
       const timeoutMs = timeoutMinutes * 60 * 1000;
       const startTime = Date.now();
 

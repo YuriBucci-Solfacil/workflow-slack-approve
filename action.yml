@@ -137,10 +137,6 @@ inputs:
     description: "Enable debug logging (verbose output)"
     required: false
     default: "false"
-  timeout-minutes:
-    description: "Maximum time to wait for approval (in minutes)"
-    required: false
-    default: "10"
 
 outputs:
   mainMessageTs:
@@ -150,7 +146,7 @@ outputs:
 # SLACK_SIGNING_SECRET - Slack app signing secret
 # SLACK_APP_TOKEN - Slack app token for socket mode
 # SLACK_CHANNEL_ID - Target Slack channel ID (Optional when using direct messages, used as fallback when direct messages fail)
-# SLACK_USER_ID - Target Slack user ID for direct message 
+# SLACK_USER_ID - Target Slack user ID for direct message
 # SLACK_USER_EMAIL - Target Slack user email (will be converted to user ID automatically)
 # NOTE: For SLACK_USER_EMAIL functionality, your Slack app needs users:read.email and im:write scopes
 # Note: UNIQUE_STEP_ID is now automatically generated and no longer needs to be provided
