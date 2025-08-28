@@ -112,3 +112,11 @@
   * **Prompt do Usuário:** "[WARN] web-api:WebClient:2 The top-level `text` argument is missing in the request payload for a chat.postMessage call - It's a best practice to always provide a `text` argument when posting a message. The `text` is used in places where the content cannot be rendered such as: system push notifications, assistive technology such as screen readers, etc."
   * **Ação/Resultado da IA:** Identifiquei todas as chamadas de API do Slack que estavam gerando o aviso e adicionei o parâmetro `text` com valores descritivos apropriados para cada tipo de mensagem (aprovação, rejeição, cancelamento, etc.), garantindo que a action siga as melhores práticas de acessibilidade e compatibilidade com diferentes clientes Slack.
 
+### Checkpoint: 15 - Melhorias na privacidade dos logs e contador de tempo
+* **GIT SHA:** `25894f0fd6eef315cdace155cbaac97396b6ce07`
+* **Commit Message:** `AI: Improved - Log system with privacy protection and timeout counter`
+* **Notes/Observations:** Aprimoramento do sistema de logs para remover informações sensíveis como IDs de usuário e endereços de e-mail das mensagens padrão, movendo-as para o modo debug. Implementação de um contador de tempo de espera que mostra o tempo decorrido e o tempo restante durante o processo de aprovação, atualizando a cada 5 segundos.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "[Exemplo de logs com informações sensíveis] Retire essas informaçõe sensiveis da LOG com ID do usuario por exemplo, coloque ela apenas no modo DEBUG, deixe o mais limpa possivel. Nessa log aqui consegue ficar atualizando ela talvez com o tempo de timeout do lado ou algo tipo, exemplo abaixo [INFO] Look at your Slack message #Melhore esse texto se quiser [INFO] Waiting for approval [5s/10m]"
+  * **Ação/Resultado da IA:** Modifiquei o sistema de logs para mover todas as informações sensíveis (como IDs de usuário, endereços de e-mail e detalhes técnicos) para o modo debug, mantendo apenas mensagens essenciais no modo padrão. Implementei um contador de tempo que mostra o tempo decorrido e o tempo restante no formato "[tempo decorrido em segundos]/[tempo restante em minutos e segundos]", atualizando a cada 5 segundos para fornecer feedback visual sobre o progresso da espera.
+
