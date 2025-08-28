@@ -80,7 +80,14 @@ if (!channel_id && !user_id && !user_email) {
     logger.error("No target destination provided. Please set at least one of SLACK_CHANNEL_ID, SLACK_USER_ID, or SLACK_USER_EMAIL.");
     process.exit(1);
 }
-const unique_step_id = process.env.UNIQUE_STEP_ID || "";
+// Gerar um ID único se não for fornecido
+function generateUniqueId() {
+    // Combinar timestamp com um número aleatório para garantir unicidade
+    const timestamp = Date.now().toString(36); // Timestamp em base 36
+    const randomPart = Math.random().toString(36).substring(2, 8); // 6 caracteres aleatórios
+    return `${timestamp}-${randomPart}`;
+}
+const unique_step_id = process.env.UNIQUE_STEP_ID || generateUniqueId();
 logger.info(`Approval process initialized`);
 const baseMessageTs = core.getInput("baseMessageTs");
 // Lista original de aprovadores (pode conter IDs ou e-mails)

@@ -76,7 +76,7 @@ jobs:
           # SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }} # Canal do Slack (opcional com mensagens diretas)
           SLACK_USER_EMAIL: ${{ secrets.SLACK_USER_EMAIL }} # Email do usuário (recomendado)
           # SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }} # ID do usuário (alternativa)
-          UNIQUE_STEP_ID: "1234"
+          # UNIQUE_STEP_ID: "custom-id" # Opcional, será gerado automaticamente se não fornecido
         timeout-minutes: 5
         with:
             approvers: U12345678,user.name@example.com
@@ -116,9 +116,10 @@ jobs:
     
     Note: At least one of these three options must be provided.
 
-  - `UNIQUE_STEP_ID`
+  - `UNIQUE_STEP_ID` (Optional)
 
-    - UNIQUE ID to differentiate the value of the html input elements
+    - Unique identifier to differentiate the value of the HTML input elements
+    - If not provided, a unique ID will be automatically generated based on timestamp and random values
 
 ## Set Inputs
 
