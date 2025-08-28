@@ -184,31 +184,31 @@ async function run(): Promise<void> {
     }
 
     // Função para buscar o ID do usuário pelo e-mail
-async function getUserIdByEmail(email: string): Promise<string | null> {
-  if (!email) {
-    return null;
-  }
+    async function getUserIdByEmail(email: string): Promise<string | null> {
+      if (!email) {
+        return null;
+      }
 
-  try {
-    const response = await web.users.lookupByEmail({
-      email: email
-    });
+      try {
+        const response = await web.users.lookupByEmail({
+          email: email
+        });
 
-    if (response.ok && response.user && response.user.id) {
-      console.log(`Found user ID ${response.user.id} for email ${email}`);
-      return response.user.id;
-    } else {
-      console.warn(`Failed to find user with email ${email}`);
-      return null;
+        if (response.ok && response.user && response.user.id) {
+          console.log(`Found user ID ${response.user.id} for email ${email}`);
+          return response.user.id;
+        } else {
+          console.warn(`Failed to find user with email ${email}`);
+          return null;
+        }
+      } catch (error) {
+        console.error(`Error looking up user by email: ${error}`);
+        return null;
+      }
     }
-  } catch (error) {
-    console.error(`Error looking up user by email: ${error}`);
-    return null;
-  }
-}
 
-// Função para obter o ID do canal da mensagem direta
-async function getDirectMessageChannel(userID: string) {
+    // Função para obter o ID do canal da mensagem direta
+    async function getDirectMessageChannel(userID: string) {
       if (!userID) {
         return channel_id; // Volta para o canal do grupo se o ID do usuário não estiver disponível
       }
@@ -232,20 +232,20 @@ async function getDirectMessageChannel(userID: string) {
     }
 
     // Tentar obter o ID do usuário pelo e-mail se não fornecido diretamente
-let finalUserId = user_id;
-if (!finalUserId && user_email) {
-  console.log(`Trying to find user ID for email: ${user_email}`);
-  const emailLookupResult = await getUserIdByEmail(user_email);
-  if (emailLookupResult) {
-    finalUserId = emailLookupResult;
-    console.log(`Successfully resolved email ${user_email} to user ID ${finalUserId}`);
-  } else {
-    console.warn(`Could not resolve email ${user_email} to a Slack user ID. Falling back to channel.`);
-  }
-}
+    let finalUserId = user_id;
+    if (!finalUserId && user_email) {
+      console.log(`Trying to find user ID for email: ${user_email}`);
+      const emailLookupResult = await getUserIdByEmail(user_email);
+      if (emailLookupResult) {
+        finalUserId = emailLookupResult;
+        console.log(`Successfully resolved email ${user_email} to user ID ${finalUserId}`);
+      } else {
+        console.warn(`Could not resolve email ${user_email} to a Slack user ID. Falling back to channel.`);
+      }
+    }
 
-// Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
-const targetChannelId = finalUserId ? await getDirectMessageChannel(finalUserId) : channel_id;
+    // Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
+    const targetChannelId = finalUserId ? await getDirectMessageChannel(finalUserId) : channel_id;
 
     const mainMessage = baseMessageTs
       ? await web.chat.update({

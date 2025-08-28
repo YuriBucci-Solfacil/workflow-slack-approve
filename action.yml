@@ -39,7 +39,6 @@ inputs:
 outputs:
   mainMessageTs:
     description: "Slack main message timestamp"
-    
 # Environment variables required:
 # SLACK_BOT_TOKEN - Slack bot token for authentication
 # SLACK_SIGNING_SECRET - Slack app signing secret
@@ -48,5 +47,4 @@ outputs:
 # SLACK_USER_ID - Target Slack user ID for direct message (use this OR SLACK_CHANNEL_ID)
 # SLACK_USER_EMAIL - Target Slack user email (will be converted to user ID automatically, use this OR SLACK_USER_ID/SLACK_CHANNEL_ID)
 # UNIQUE_STEP_ID - Unique identifier for this approval step
-  
-  
+
