@@ -137,6 +137,10 @@ inputs:
     description: "Enable debug logging (verbose output)"
     required: false
     default: "false"
+  timeout-minutes:
+    description: "Maximum time to wait for approval (in minutes)"
+    required: false
+    default: "10"
 
 outputs:
   mainMessageTs:
