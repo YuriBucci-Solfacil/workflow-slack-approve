@@ -72,11 +72,10 @@ jobs:
           SLACK_APP_TOKEN: ${{ secrets.SLACK_APP_TOKEN }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-          # IMPORTANTE: Configure sempre SLACK_CHANNEL_ID como fallback
-          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
-          # Opções para mensagens diretas (opcional):
-          # SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }}
-          # SLACK_USER_EMAIL: ${{ secrets.SLACK_USER_EMAIL }}
+          # Opções de destino (pelo menos uma é necessária):
+          # SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }} # Canal do Slack (opcional com mensagens diretas)
+          SLACK_USER_EMAIL: ${{ secrets.SLACK_USER_EMAIL }} # Email do usuário (recomendado)
+          # SLACK_USER_ID: ${{ secrets.SLACK_USER_ID }} # ID do usuário (alternativa)
           UNIQUE_STEP_ID: "1234"
         timeout-minutes: 5
         with:
@@ -106,9 +105,11 @@ jobs:
 
   - `SLACK_CHANNEL_ID`, `SLACK_USER_ID` ou `SLACK_USER_EMAIL` (use apenas uma destas opções)
 
-    - `SLACK_CHANNEL_ID`: Channel ID for which you want to send approval. **IMPORTANTE**: Configure este valor mesmo que você vá usar SLACK_USER_ID ou SLACK_USER_EMAIL, pois ele serve como fallback caso haja problemas com as mensagens diretas.
-    - `SLACK_USER_ID`: User ID to send direct message approval (use this together with SLACK_CHANNEL_ID as fallback).
+    - `SLACK_CHANNEL_ID`: Channel ID for which you want to send approval. Optional when using direct messages, but recommended as a fallback if direct messages fail.
+    - `SLACK_USER_ID`: User ID to send direct message approval.
     - `SLACK_USER_EMAIL`: Email address of the Slack user to send direct message approval. The app will automatically lookup the user ID based on this email. **REQUIRES ADDITIONAL SCOPES**: You must add `users:read.email` and `im:write` scopes to your Slack app for this feature to work.
+    
+    Note: At least one of these three options must be provided.
 
   - `UNIQUE_STEP_ID`
 

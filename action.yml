@@ -43,9 +43,9 @@ outputs:
 # SLACK_BOT_TOKEN - Slack bot token for authentication
 # SLACK_SIGNING_SECRET - Slack app signing secret
 # SLACK_APP_TOKEN - Slack app token for socket mode
-# SLACK_CHANNEL_ID - Target Slack channel ID (REQUIRED, used as fallback when direct messages fail)
-# SLACK_USER_ID - (Optional) Target Slack user ID for direct message 
-# SLACK_USER_EMAIL - (Optional) Target Slack user email (will be converted to user ID automatically)
+# SLACK_CHANNEL_ID - Target Slack channel ID (Optional when using direct messages, used as fallback when direct messages fail)
+# SLACK_USER_ID - Target Slack user ID for direct message 
+# SLACK_USER_EMAIL - Target Slack user email (will be converted to user ID automatically)
 # NOTE: For SLACK_USER_EMAIL functionality, your Slack app needs users:read.email and im:write scopes
 # UNIQUE_STEP_ID - Unique identifier for this approval step
 

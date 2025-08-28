@@ -9,9 +9,9 @@ const channel_id = process.env.SLACK_CHANNEL_ID || "";
 const user_id = process.env.SLACK_USER_ID || "";
 const user_email = process.env.SLACK_USER_EMAIL || "";
 
-// Verificando se SLACK_CHANNEL_ID foi fornecido (obrigatório)
-if (!channel_id) {
-  console.error("Error: SLACK_CHANNEL_ID environment variable is required. Please set it to a valid Slack channel ID.");
+// Verificando se pelo menos uma opção de destino foi fornecida
+if (!channel_id && !user_id && !user_email) {
+  console.error("Error: No target destination provided. Please set at least one of SLACK_CHANNEL_ID, SLACK_USER_ID, or SLACK_USER_EMAIL.");
   process.exit(1);
 }
 const unique_step_id = process.env.UNIQUE_STEP_ID || "";
@@ -62,7 +62,7 @@ function hasPayload(inputs: any) {
 async function run(): Promise<void> {
   try {
     const web = new WebClient(token);
-    
+
     // Função para resolver e-mail para ID de usuário
     async function resolveEmailToUserId(email: string): Promise<string | null> {
       try {
@@ -70,7 +70,7 @@ async function run(): Promise<void> {
         const response = await web.users.lookupByEmail({
           email: email
         });
-        
+
         if (response.ok && response.user && response.user.id) {
           console.log(`Successfully resolved email ${email} to Slack user ID: ${response.user.id}`);
           return response.user.id;
@@ -83,7 +83,7 @@ async function run(): Promise<void> {
         return null;
       }
     }
-    
+
     // Resolver os e-mails dos aprovadores para IDs de usuário do Slack
     for (const approver of rawApprovers) {
       approver.trim();
@@ -103,7 +103,7 @@ async function run(): Promise<void> {
         console.log(`Added direct Slack user ID ${approver} to approvers list`);
       }
     }
-    
+
     // Verificar se há aprovadores válidos após a resolução
     if (requiredApprovers.length === 0) {
       console.error("Error: No valid approvers found. Please check the approvers list and ensure emails can be resolved to Slack user IDs.");
@@ -267,17 +267,22 @@ async function run(): Promise<void> {
       }
     }
 
-    // Função para obter o ID do canal da mensagem direta
+        // Função para obter o ID do canal da mensagem direta
     async function getDirectMessageChannel(userID: string) {
       if (!userID) {
-        console.log("No user ID provided. Using channel instead.");
-        return channel_id; // Volta para o canal do grupo se o ID do usuário não estiver disponível
+        if (channel_id) {
+          console.log("No user ID provided. Using channel instead.");
+          return channel_id; // Volta para o canal do grupo se o ID do usuário não estiver disponível e um canal foi configurado
+        } else {
+          console.error("Error: No user ID could be resolved and no fallback channel provided. Unable to send message.");
+          process.exit(1);
+        }
       }
 
       try {
         // Verifica se o bot tem as permissões necessárias
         console.log(`Attempting to open direct message with user: ${userID}`);
-
+        
         // Abre uma conversa direta com o usuário
         const conversationResponse = await web.conversations.open({
           users: userID
@@ -289,14 +294,24 @@ async function run(): Promise<void> {
         } else {
           console.warn(`Failed to open direct message channel: ${JSON.stringify(conversationResponse.error || "Unknown error")}`);
           console.warn("Make sure your Slack app has the 'im:write' scope enabled");
-          console.warn("Falling back to group channel");
-          return channel_id;
+          if (channel_id) {
+            console.warn("Falling back to group channel");
+            return channel_id;
+          } else {
+            console.error("No fallback channel provided. Unable to send message.");
+            process.exit(1);
+          }
         }
       } catch (error) {
         console.error(`Error opening direct message: ${error}`);
         console.warn("This may be due to missing 'im:write' scope. Please add this scope to your Slack app");
-        console.warn("Falling back to group channel:", channel_id);
-        return channel_id; // Volta para o canal do grupo em caso de erro
+        if (channel_id) {
+          console.warn("Falling back to group channel:", channel_id);
+          return channel_id; // Volta para o canal do grupo em caso de erro se um canal foi configurado
+        } else {
+          console.error("No fallback channel provided. Unable to send message.");
+          process.exit(1);
+        }
       }
     }
 
@@ -313,16 +328,25 @@ async function run(): Promise<void> {
       }
     }
 
-    // Verificar se o canal do grupo existe
-    try {
-      await web.conversations.info({
-        channel: channel_id
-      });
-      console.log(`Channel ${channel_id} exists and is accessible.`);
-    } catch (error) {
-      console.error(`Error: The fallback channel ${channel_id} does not exist or bot doesn't have access to it. Please ensure the SLACK_CHANNEL_ID is correct and the bot is invited to the channel.`);
-      console.error(`Error details: ${error}`);
-      process.exit(1);
+    // Verificar se o canal do grupo existe (se foi fornecido)
+    if (channel_id) {
+      try {
+        await web.conversations.info({
+          channel: channel_id
+        });
+        console.log(`Channel ${channel_id} exists and is accessible.`);
+      } catch (error) {
+        console.error(`Error: The fallback channel ${channel_id} does not exist or bot doesn't have access to it. Please ensure the SLACK_CHANNEL_ID is correct and the bot is invited to the channel.`);
+        console.error(`Error details: ${error}`);
+        // Só vamos sair se não tivermos um ID de usuário válido, pois podemos tentar enviar diretamente sem usar o canal
+        if (!finalUserId) {
+          process.exit(1);
+        } else {
+          console.warn("Invalid channel but user ID is available. Will attempt to send direct message without fallback channel.");
+        }
+      }
+    } else {
+      console.log("No channel ID provided. Using direct messages only without fallback.");
     }
 
     // Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
