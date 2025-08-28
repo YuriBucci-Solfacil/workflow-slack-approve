@@ -104,7 +104,7 @@ async function run(): Promise<void> {
       console.error("Error: No valid approvers found. Please check the approvers list and ensure emails can be resolved to Slack user IDs.");
       process.exit(1);
     }
-    
+
     // Verificar se o número mínimo de aprovadores é válido
     if (minimumApprovalCount > requiredApprovers.length) {
       console.error(
@@ -446,12 +446,31 @@ async function run(): Promise<void> {
             if (approveResult === "approved") {
               logger.info(`Request fully approved by ${userName}. Exiting with success.`);
 
+              // Criar uma mensagem de sucesso personalizada que inclui o status de aprovação e uma mensagem de confirmação
+              const successBlocks = hasPayload(successMessagePayload) 
+                ? [...successMessagePayload.blocks || [], {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: `🎉 *Approval Complete!* All ${minimumApprovalCount} required approvals have been received.\nApproved by ${approvers.map((v) => `<@${v}>`).join(", ")} on ${new Date().toLocaleString()}`
+                    }
+                  }]
+                : [
+                    ...mainMessagePayload.blocks.slice(0, -2),
+                    {
+                      type: "section",
+                      text: {
+                        type: "mrkdwn",
+                        text: `🎉 *Approval Complete!* All ${minimumApprovalCount} required approvals have been received.\nApproved by ${approvers.map((v) => `<@${v}>`).join(", ")} on ${new Date().toLocaleString()}`
+                      }
+                    }
+                  ];
+
               await client.chat.update({
                 ts: mainMessage.ts || "",
                 channel: channelId || targetChannelId,
-                ...(hasPayload(successMessagePayload)
-                  ? successMessagePayload
-                  : mainMessagePayload),
+                text: "GitHub Actions Approval Request - APPROVED",
+                blocks: successBlocks
               });
 
             } else if (approveResult === "remainApproval") {
@@ -569,12 +588,15 @@ async function run(): Promise<void> {
 
           // Update the main message with rejection
           try {
-            await client.chat.update({
-              ts: mainMessage.ts || "",
-              channel: channelId || targetChannelId,
-              ...(hasPayload(failMessagePayload) ? failMessagePayload : {
-                text: `❌ Request rejected by <@${userId}>`,
-                blocks: [
+            const rejectionBlocks = hasPayload(failMessagePayload) 
+              ? [...failMessagePayload.blocks || [], {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `❌ *Request Rejected*\nRejected by <@${userId}> on ${new Date().toLocaleString()}`,
+                  },
+                }]
+              : [
                   ...mainMessagePayload.blocks.slice(0, -2),
                   {
                     type: "section",
@@ -583,8 +605,13 @@ async function run(): Promise<void> {
                       text: `❌ *Request Rejected*\nRejected by <@${userId}> on ${new Date().toLocaleString()}`,
                     },
                   },
-                ],
-              }),
+                ];
+            
+            await client.chat.update({
+              ts: mainMessage.ts || "",
+              channel: channelId || targetChannelId,
+              text: "GitHub Actions Approval Request - REJECTED",
+              blocks: rejectionBlocks,
             });
 
           } catch (updateError) {

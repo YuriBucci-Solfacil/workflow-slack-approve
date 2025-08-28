@@ -437,9 +437,31 @@ function run() {
                     try {
                         if (approveResult === "approved") {
                             logger.info(`Request fully approved by ${userName}. Exiting with success.`);
-                            yield client.chat.update(Object.assign({ ts: mainMessage.ts || "", channel: channelId || targetChannelId }, (hasPayload(successMessagePayload)
-                                ? successMessagePayload
-                                : mainMessagePayload)));
+                            // Criar uma mensagem de sucesso personalizada que inclui o status de aprovação e uma mensagem de confirmação
+                            const successBlocks = hasPayload(successMessagePayload)
+                                ? [...successMessagePayload.blocks || [], {
+                                        type: "section",
+                                        text: {
+                                            type: "mrkdwn",
+                                            text: `🎉 *Approval Complete!* All ${minimumApprovalCount} required approvals have been received.\nApproved by ${approvers.map((v) => `<@${v}>`).join(", ")} on ${new Date().toLocaleString()}`
+                                        }
+                                    }]
+                                : [
+                                    ...mainMessagePayload.blocks.slice(0, -2),
+                                    {
+                                        type: "section",
+                                        text: {
+                                            type: "mrkdwn",
+                                            text: `🎉 *Approval Complete!* All ${minimumApprovalCount} required approvals have been received.\nApproved by ${approvers.map((v) => `<@${v}>`).join(", ")} on ${new Date().toLocaleString()}`
+                                        }
+                                    }
+                                ];
+                            yield client.chat.update({
+                                ts: mainMessage.ts || "",
+                                channel: channelId || targetChannelId,
+                                text: "GitHub Actions Approval Request - APPROVED",
+                                blocks: successBlocks
+                            });
                         }
                         else if (approveResult === "remainApproval") {
                             logger.info(`Partial approval by ${userName}. ${minimumApprovalCount - approvers.length} more approvals needed.`);
@@ -539,9 +561,15 @@ function run() {
                     logger.info(`Request rejected by ${userName}. Exiting with failure.`);
                     // Update the main message with rejection
                     try {
-                        yield client.chat.update(Object.assign({ ts: mainMessage.ts || "", channel: channelId || targetChannelId }, (hasPayload(failMessagePayload) ? failMessagePayload : {
-                            text: `❌ Request rejected by <@${userId}>`,
-                            blocks: [
+                        const rejectionBlocks = hasPayload(failMessagePayload)
+                            ? [...failMessagePayload.blocks || [], {
+                                    type: "section",
+                                    text: {
+                                        type: "mrkdwn",
+                                        text: `❌ *Request Rejected*\nRejected by <@${userId}> on ${new Date().toLocaleString()}`,
+                                    },
+                                }]
+                            : [
                                 ...mainMessagePayload.blocks.slice(0, -2),
                                 {
                                     type: "section",
@@ -550,8 +578,13 @@ function run() {
                                         text: `❌ *Request Rejected*\nRejected by <@${userId}> on ${new Date().toLocaleString()}`,
                                     },
                                 },
-                            ],
-                        })));
+                            ];
+                        yield client.chat.update({
+                            ts: mainMessage.ts || "",
+                            channel: channelId || targetChannelId,
+                            text: "GitHub Actions Approval Request - REJECTED",
+                            blocks: rejectionBlocks,
+                        });
                     }
                     catch (updateError) {
                         logger.error(`Failed to update message with rejection: ${updateError}`);
