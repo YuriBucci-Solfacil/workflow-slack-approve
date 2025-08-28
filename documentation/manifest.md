@@ -136,3 +136,11 @@
   * **Prompt do Usuário:** "Não quero colocar como opcional, deixe somente com a geração automatica"
   * **Ação/Resultado da IA:** Removi completamente a dependência da variável de ambiente `UNIQUE_STEP_ID`, modificando o código para sempre usar a função `generateUniqueId()`. Atualizei a documentação no README.md e no action.yml para refletir que o ID agora é sempre gerado automaticamente e não precisa mais ser fornecido pelo usuário. Removi também a referência à variável no exemplo de configuração.
 
+### Checkpoint: 18 - Correção do formato do contador de tempo
+* **GIT SHA:** `051fbc98072f7bbb02203c382b71cbae9e0a58ca`
+* **Commit Message:** `AI: Fixed - Time counter display format`
+* **Notes/Observations:** Correção do formato de exibição do contador de tempo de espera. Agora o tempo decorrido é exibido em formato de minutos e segundos quando ultrapassa 60 segundos, tornando a saída mais legível e consistente com o formato do tempo restante.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Acho que ta alguma coisa errada no tempo corrido" (com imagem dos logs mostrando o problema)
+  * **Ação/Resultado da IA:** Modifiquei a lógica de formatação do tempo decorrido para converter segundos em minutos e segundos quando o valor ultrapassa 60 segundos. Agora, em vez de mostrar apenas segundos (como "95s"), o sistema exibe "1m35s", tornando a leitura mais clara e consistente com o formato do tempo restante.
+
