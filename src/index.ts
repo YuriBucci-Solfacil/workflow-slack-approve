@@ -712,9 +712,18 @@ async function run(): Promise<void> {
           clearInterval(timer);
           logger.info("Waiting for approval [timeout]");
         } else {
+          // Formatar o tempo decorrido em minutos e segundos
+          const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+          const elapsedSecondsDisplay = elapsedSeconds % 60;
+          const elapsedFormatted = elapsedMinutes > 0 
+            ? `${elapsedMinutes}m${elapsedSecondsDisplay}s` 
+            : `${elapsedSeconds}s`;
+          
+          // Formatar o tempo restante
           const remainingMinutes = Math.floor(remainingMs / 60000);
           const remainingSeconds = Math.floor((remainingMs % 60000) / 1000);
-          logger.info(`Waiting for approval [${elapsedSeconds}s/${remainingMinutes}m${remainingSeconds}s]`);
+          
+          logger.info(`Waiting for approval [${elapsedFormatted}/${remainingMinutes}m${remainingSeconds}s]`);
         }
       }, 5000); // Atualizar a cada 5 segundos
 
