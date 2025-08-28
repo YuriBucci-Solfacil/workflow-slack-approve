@@ -128,3 +128,11 @@
   * **Prompt do Usuário:** "UNIQUE_STEP_ID não conseguimos gerar algum numero aleatorio automaticamente?"
   * **Ação/Resultado da IA:** Implementei uma função `generateUniqueId()` que cria um identificador único baseado em um timestamp e um número aleatório quando o `UNIQUE_STEP_ID` não é fornecido pelo usuário. Atualizei a documentação para refletir que esta variável de ambiente agora é opcional e modificamos o exemplo no README para mostrar que o ID será gerado automaticamente se não for especificado.
 
+### Checkpoint: 17 - Remoção da variável UNIQUE_STEP_ID
+* **GIT SHA:** `086f7d298b8aa956d2b7884886d4f29d1c384ee3`
+* **Commit Message:** `AI: Changed - UNIQUE_STEP_ID now always auto-generated`
+* **Notes/Observations:** Remoção completa da variável de ambiente `UNIQUE_STEP_ID`, tornando a geração automática do identificador único obrigatória. Agora o ID é sempre gerado internamente pela action, sem a possibilidade de ser fornecido manualmente pelo usuário, simplificando a configuração e garantindo a unicidade em todas as execuções.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Não quero colocar como opcional, deixe somente com a geração automatica"
+  * **Ação/Resultado da IA:** Removi completamente a dependência da variável de ambiente `UNIQUE_STEP_ID`, modificando o código para sempre usar a função `generateUniqueId()`. Atualizei a documentação no README.md e no action.yml para refletir que o ID agora é sempre gerado automaticamente e não precisa mais ser fornecido pelo usuário. Removi também a referência à variável no exemplo de configuração.
+
