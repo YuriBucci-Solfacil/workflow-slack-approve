@@ -104,3 +104,11 @@
   * **Prompt do Usuário:** "Adicione também mensagems default para os payloads, hoje está em branco"
   * **Ação/Resultado da IA:** Criei templates completos para os três tipos de mensagens: requisição de aprovação com cabeçalho "🔔 Approval Request", mensagem de aprovação com cabeçalho "✅ Approval Completed" e mensagem de rejeição com cabeçalho "❌ Approval Rejected". Cada template inclui elementos visuais como cabeçalho, texto formatado, divisor e seção de contexto, seguindo as melhores práticas de formatação do Slack.
 
+### Checkpoint: 14 - Correção do aviso de parâmetro text ausente
+* **GIT SHA:** `46249ba6ee81a71c12d9cc4e25b061c75f17f1bb`
+* **Commit Message:** `AI: Fixed - Added text parameter to Slack API calls`
+* **Notes/Observations:** Correção de um aviso da API do Slack sobre a ausência do parâmetro `text` nas chamadas de `chat.postMessage` e `chat.update`. Adicionei o parâmetro `text` em todas as chamadas relevantes para seguir as melhores práticas da API do Slack, garantindo que as mensagens sejam corretamente renderizadas em notificações push e tecnologias assistivas como leitores de tela.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "[WARN] web-api:WebClient:2 The top-level `text` argument is missing in the request payload for a chat.postMessage call - It's a best practice to always provide a `text` argument when posting a message. The `text` is used in places where the content cannot be rendered such as: system push notifications, assistive technology such as screen readers, etc."
+  * **Ação/Resultado da IA:** Identifiquei todas as chamadas de API do Slack que estavam gerando o aviso e adicionei o parâmetro `text` com valores descritivos apropriados para cada tipo de mensagem (aprovação, rejeição, cancelamento, etc.), garantindo que a action siga as melhores práticas de acessibilidade e compatibilidade com diferentes clientes Slack.
+
