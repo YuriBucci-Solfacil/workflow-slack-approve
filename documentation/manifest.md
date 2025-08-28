@@ -144,3 +144,11 @@
   * **Prompt do Usuário:** "Acho que ta alguma coisa errada no tempo corrido" (com imagem dos logs mostrando o problema)
   * **Ação/Resultado da IA:** Modifiquei a lógica de formatação do tempo decorrido para converter segundos em minutos e segundos quando o valor ultrapassa 60 segundos. Agora, em vez de mostrar apenas segundos (como "95s"), o sistema exibe "1m35s", tornando a leitura mais clara e consistente com o formato do tempo restante.
 
+### Checkpoint: 19 - Melhoria na privacidade dos logs
+* **GIT SHA:** `5e25f46f77a25006d93ad8b47af9bd4e04af3f38`
+* **Commit Message:** `AI: Improved - Privacy in logs by moving IDs to debug mode`
+* **Notes/Observations:** Melhoria na privacidade dos logs movendo todas as informações sensíveis (IDs de usuário e canais) para o modo debug. Agora os logs padrão mostram apenas informações essenciais como nomes de usuário e e-mails, enquanto os IDs técnicos só são exibidos quando o modo debug está ativado. Também foi implementada uma melhor exibição de e-mails em vez de IDs nos logs de debug quando disponíveis.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Porque ele ta trazendo 2 IDS diferentes? Ao invés disso também o ID deve ser exebido somente no modo debug, ao invés disso coloque o e-mail do usuário"
+  * **Ação/Resultado da IA:** Modifiquei o sistema de logs para exibir apenas informações amigáveis (nomes de usuário, e-mails) nos logs padrão e mover todos os IDs técnicos (user IDs, channel IDs) para o modo debug. Também implementei a exibição de e-mails em vez de IDs quando disponíveis, tornando os logs mais legíveis e privados por padrão, enquanto mantém todas as informações técnicas disponíveis para depuração quando necessário.
+
