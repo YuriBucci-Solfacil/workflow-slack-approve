@@ -96,3 +96,11 @@
   * **Prompt do Usuário:** "Agora melhore as logs e cores para ficar mais profissional e adicione uma opção para desativar e ativar o debug sendo o default desabilitado"
   * **Ação/Resultado da IA:** Implementei um sistema de logging colorido usando a biblioteca chalk, com diferentes cores para cada tipo de mensagem (info em azul, sucesso em verde, avisos em amarelo, erros em vermelho e debug em magenta). Adicionei o parâmetro `debug` (padrão: false) que permite ativar logs de depuração detalhados e otimizei todas as mensagens do sistema para usar o novo formato.
 
+### Checkpoint: 13 - Adição de mensagens default para os payloads
+* **GIT SHA:** `7d9bbcb9a5e21307fdaa4a5bb4782f8d5b270887`
+* **Commit Message:** `AI: Added - Default message templates for payloads`
+* **Notes/Observations:** Implementação de templates de mensagens padrão para os diferentes payloads da Action (baseMessagePayload, successMessagePayload e failMessagePayload). Anteriormente os payloads eram objetos vazios por padrão, agora cada um tem um formato bem estruturado com cabeçalho, texto, divisor e seção de contexto, melhorando significativamente a aparência das mensagens no Slack.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Adicione também mensagems default para os payloads, hoje está em branco"
+  * **Ação/Resultado da IA:** Criei templates completos para os três tipos de mensagens: requisição de aprovação com cabeçalho "🔔 Approval Request", mensagem de aprovação com cabeçalho "✅ Approval Completed" e mensagem de rejeição com cabeçalho "❌ Approval Rejected". Cada template inclui elementos visuais como cabeçalho, texto formatado, divisor e seção de contexto, seguindo as melhores práticas de formatação do Slack.
+
