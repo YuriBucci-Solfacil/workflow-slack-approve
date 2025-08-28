@@ -76,10 +76,7 @@ const app = new bolt_1.App({
     port: 3000,
     logLevel: bolt_1.LogLevel.DEBUG,
 });
-if (minimumApprovalCount > requiredApprovers.length) {
-    console.error("Error: Insufficient approvers. Minimum required approvers not met.");
-    process.exit(1);
-}
+// A verificação de número mínimo de aprovadores será feita depois de resolver os e-mails para IDs
 function hasPayload(inputs) {
     var _a, _b;
     return ((_a = inputs.text) === null || _a === void 0 ? void 0 : _a.length) > 0 || ((_b = inputs.blocks) === null || _b === void 0 ? void 0 : _b.length) > 0;
@@ -135,6 +132,12 @@ function run() {
             // Verificar se há aprovadores válidos após a resolução
             if (requiredApprovers.length === 0) {
                 console.error("Error: No valid approvers found. Please check the approvers list and ensure emails can be resolved to Slack user IDs.");
+                process.exit(1);
+            }
+            // Verificar se o número mínimo de aprovadores é válido
+            if (minimumApprovalCount > requiredApprovers.length) {
+                console.error(`Error: Insufficient approvers. Minimum required approvers (${minimumApprovalCount}) not met. Only ${requiredApprovers.length} valid approver(s) found.`);
+                console.error(`Valid approvers: ${requiredApprovers.join(", ")}`);
                 process.exit(1);
             }
             const github_server_url = process.env.GITHUB_SERVER_URL || "";

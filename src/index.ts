@@ -49,12 +49,7 @@ const app = new App({
   logLevel: LogLevel.DEBUG,
 });
 
-if (minimumApprovalCount > requiredApprovers.length) {
-  console.error(
-    "Error: Insufficient approvers. Minimum required approvers not met."
-  );
-  process.exit(1);
-}
+// A verificação de número mínimo de aprovadores será feita depois de resolver os e-mails para IDs
 function hasPayload(inputs: any) {
   return inputs.text?.length > 0 || inputs.blocks?.length > 0;
 }
@@ -107,6 +102,15 @@ async function run(): Promise<void> {
     // Verificar se há aprovadores válidos após a resolução
     if (requiredApprovers.length === 0) {
       console.error("Error: No valid approvers found. Please check the approvers list and ensure emails can be resolved to Slack user IDs.");
+      process.exit(1);
+    }
+    
+    // Verificar se o número mínimo de aprovadores é válido
+    if (minimumApprovalCount > requiredApprovers.length) {
+      console.error(
+        `Error: Insufficient approvers. Minimum required approvers (${minimumApprovalCount}) not met. Only ${requiredApprovers.length} valid approver(s) found.`
+      );
+      console.error(`Valid approvers: ${requiredApprovers.join(", ")}`);
       process.exit(1);
     }
 
@@ -267,7 +271,7 @@ async function run(): Promise<void> {
       }
     }
 
-        // Função para obter o ID do canal da mensagem direta
+    // Função para obter o ID do canal da mensagem direta
     async function getDirectMessageChannel(userID: string) {
       if (!userID) {
         if (channel_id) {
@@ -282,7 +286,7 @@ async function run(): Promise<void> {
       try {
         // Verifica se o bot tem as permissões necessárias
         console.log(`Attempting to open direct message with user: ${userID}`);
-        
+
         // Abre uma conversa direta com o usuário
         const conversationResponse = await web.conversations.open({
           users: userID
