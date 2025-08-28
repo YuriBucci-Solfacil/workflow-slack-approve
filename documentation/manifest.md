@@ -72,3 +72,11 @@
   * **Prompt do Usuário:** "Parece que agora não mandou nada: unique_step_id 1234 [DEBUG] web-api:WebClient:0 initialized [...] Error: Insufficient approvers. Minimum required approvers not met."
   * **Ação/Resultado da IA:** Identifiquei que a verificação de número mínimo de aprovadores estava sendo executada antes da conversão de e-mails para IDs. Movi a verificação para depois da resolução de e-mails e adicionei mensagens de erro mais detalhadas para facilitar a depuração.
 
+### Checkpoint: 10 - Melhorias na interface de aprovação
+* **GIT SHA:** `b3fc1d61d6fdd9affc10814dad9e4d9d044333f8`
+* **Commit Message:** `AI: Fixed - Show confirmation message after approval or rejection`
+* **Notes/Observations:** Melhoria na interface de usuário após a aprovação ou rejeição. Os botões agora são substituídos por uma mensagem de confirmação clara, indicando quando e por quem a aprovação ou rejeição foi feita.
+* **AI Interaction**:
+  * **Prompt do Usuário:** "Agora funcionou o approve, porém após clicar não era pro botão sumir e retornar alguma mensagem?"
+  * **Ação/Resultado da IA:** Identifiquei que os botões de aprovação não estavam sendo removidos após a aprovação. Modifiquei o código para substituir os botões por uma mensagem de confirmação clara que mostra quem aprovou e quando a aprovação foi concluída.
+
