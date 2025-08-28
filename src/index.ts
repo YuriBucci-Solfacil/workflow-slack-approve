@@ -389,10 +389,12 @@ async function run(): Promise<void> {
       ? await web.chat.update({
         channel: targetChannelId,
         ts: baseMessageTs,
+        text: "GitHub Actions Approval Request",
         ...mainMessagePayload,
       })
       : await web.chat.postMessage({
         channel: targetChannelId,
+        text: "GitHub Actions Approval Request",
         ...mainMessagePayload,
       });
 
@@ -402,6 +404,7 @@ async function run(): Promise<void> {
       await web.chat.update({
         ts: mainMessage.ts!,
         channel: targetChannelId,
+        text: "GitHub Actions Approval Request - CANCELLED",
         ...(hasPayload(failMessagePayload) ? failMessagePayload : mainMessagePayload),
       });
       process.exit(1);
@@ -508,7 +511,7 @@ async function run(): Promise<void> {
               await client.chat.update({
                 channel: channelId || targetChannelId,
                 ts: mainMessage?.ts || "",
-                text: "",
+                text: "GitHub Actions Approval Request - PENDING",
                 blocks: [
                   ...mainMessagePayload.blocks.slice(0, -2),
                   renderApprovalStatus(),

@@ -403,12 +403,12 @@ function run() {
             // Determinar o canal para enviar a mensagem (DM para usuário ou canal do grupo)
             const targetChannelId = finalUserId ? yield getDirectMessageChannel(finalUserId) : channel_id;
             const mainMessage = baseMessageTs
-                ? yield web.chat.update(Object.assign({ channel: targetChannelId, ts: baseMessageTs }, mainMessagePayload))
-                : yield web.chat.postMessage(Object.assign({ channel: targetChannelId }, mainMessagePayload));
+                ? yield web.chat.update(Object.assign({ channel: targetChannelId, ts: baseMessageTs, text: "GitHub Actions Approval Request" }, mainMessagePayload))
+                : yield web.chat.postMessage(Object.assign({ channel: targetChannelId, text: "GitHub Actions Approval Request" }, mainMessagePayload));
             core.setOutput("mainMessageTs", mainMessage.ts);
             function cancelHandler() {
                 return __awaiter(this, void 0, void 0, function* () {
-                    yield web.chat.update(Object.assign({ ts: mainMessage.ts, channel: targetChannelId }, (hasPayload(failMessagePayload) ? failMessagePayload : mainMessagePayload)));
+                    yield web.chat.update(Object.assign({ ts: mainMessage.ts, channel: targetChannelId, text: "GitHub Actions Approval Request - CANCELLED" }, (hasPayload(failMessagePayload) ? failMessagePayload : mainMessagePayload)));
                     process.exit(1);
                 });
             }
@@ -497,7 +497,7 @@ function run() {
                             yield client.chat.update({
                                 channel: channelId || targetChannelId,
                                 ts: (mainMessage === null || mainMessage === void 0 ? void 0 : mainMessage.ts) || "",
-                                text: "",
+                                text: "GitHub Actions Approval Request - PENDING",
                                 blocks: [
                                     ...mainMessagePayload.blocks.slice(0, -2),
                                     renderApprovalStatus(),
